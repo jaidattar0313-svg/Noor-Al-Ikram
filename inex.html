@@ -1,795 +1,438 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d5c4a">
+<title>Noor-al-Ikram</title>
+<style>
+:root{--bg:#faf6ec;--card:#fff;--text:#2a2418;--dim:#7a6f5c;--border:#e0d4a8;--primary:#0d5c4a;--primary2:#148f70;--accent:#c9a227;--gold:#e8d48a;--green:#f7f0dc;--shadow:0 2px 10px rgba(13,92,74,.08)}
+body.dark{--bg:#0a1811;--card:#12261c;--text:#ece4c9;--dim:#a89a7a;--border:#3d5a4a;--primary:#e8c860;--primary2:#f0d67a;--accent:#d4af37;--gold:#4a3f1f;--green:#16281e;--shadow:0 2px 12px rgba(0,0,0,.5)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI','Noto Naskh Arabic',Tahoma,sans-serif;background:var(--bg);color:var(--text);padding:12px 12px 90px;min-height:100vh;transition:background .3s,color .3s}
+body::before{content:'';position:fixed;bottom:0;left:0;right:0;height:320px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax meet'%3E%3Cg fill='%23c9a227'%3E%3Crect x='0' y='285' width='1200' height='15'/%3E%3Crect x='66' y='70' width='14' height='215'/%3E%3Crect x='62' y='60' width='22' height='12' rx='1'/%3E%3Cpath d='M 64 60 Q 73 30 82 60 Z'/%3E%3Ccircle cx='73' cy='22' r='3'/%3E%3Crect x='200' y='110' width='10' height='175'/%3E%3Crect x='197' y='102' width='16' height='10' rx='1'/%3E%3Cpath d='M 198 102 Q 205 80 212 102 Z'/%3E%3Crect x='250' y='170' width='130' height='115'/%3E%3Cpath d='M 250 170 Q 250 105 315 105 Q 380 105 380 170 Z'/%3E%3Crect x='313' y='88' width='4' height='20'/%3E%3Ccircle cx='315' cy='85' r='3'/%3E%3Crect x='450' y='140' width='300' height='145'/%3E%3Cpath d='M 450 140 Q 450 40 600 40 Q 750 40 750 140 Z'/%3E%3Crect x='597' y='20' width='6' height='23'/%3E%3Ccircle cx='600' cy='16' r='4'/%3E%3Crect x='820' y='170' width='130' height='115'/%3E%3Cpath d='M 820 170 Q 820 105 885 105 Q 950 105 950 170 Z'/%3E%3Crect x='883' y='88' width='4' height='20'/%3E%3Ccircle cx='885' cy='85' r='3'/%3E%3Crect x='990' y='110' width='10' height='175'/%3E%3Crect x='987' y='102' width='16' height='10' rx='1'/%3E%3Cpath d='M 988 102 Q 995 80 1002 102 Z'/%3E%3Crect x='1120' y='70' width='14' height='215'/%3E%3Crect x='1116' y='60' width='22' height='12' rx='1'/%3E%3Cpath d='M 1118 60 Q 1127 30 1136 60 Z'/%3E%3Ccircle cx='1127' cy='22' r='3'/%3E%3C/g%3E%3C/svg%3E");background-size:100% 100%;background-repeat:no-repeat;background-position:center bottom;pointer-events:none;z-index:0;opacity:.14}
+body.dark::before{opacity:.18;filter:brightness(1.4)}
+.header,.tabs,.page{position:relative;z-index:1}
+.hidden{display:none!important}
+.header{background:linear-gradient(135deg,#0d5c4a,#148f70);color:#fff;padding:16px 18px;border-radius:16px;margin-bottom:12px;box-shadow:0 4px 14px rgba(13,92,74,.25);border:1px solid rgba(201,162,39,.35);display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:20px;color:#f5e6b8}
+.header p{font-size:11px;opacity:.9;margin-top:2px;color:#e8d48a}
+.icon-btn{background:rgba(201,162,39,.22);border:1px solid rgba(201,162,39,.4);color:#f5e6b8;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer}
+body.dark .header{background:linear-gradient(135deg,#0d3d2a,#1a4d2e);border-color:rgba(212,175,55,.4)}
+body.dark .header h1{color:#f0d67a}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:9px 14px;background:var(--card);border:2px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;font-weight:600;color:var(--primary);white-space:nowrap}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-color:var(--accent)}
+body.dark .tab.active{color:#1a1208}
+.page{display:none}
+.page.active{display:block}
+.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card h2{font-size:15px;color:var(--primary);margin-bottom:12px;border-bottom:2px solid var(--border);padding-bottom:8px;display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:.4px}
+.card h2 .sub{font-size:11px;color:var(--dim);font-weight:400;text-transform:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--green);border-radius:10px;padding:12px 6px;text-align:center;border:1px solid var(--border)}
+.stat .num{font-size:20px;font-weight:700;color:var(--primary)}
+.stat .lbl{font-size:10px;color:var(--dim);margin-top:4px}
+.progress-bar{height:22px;background:var(--green);border-radius:11px;overflow:hidden;margin:8px 0;position:relative;border:1px solid var(--border)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s;border-radius:11px}
+.progress-text{position:absolute;width:100%;text-align:center;top:2px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.juz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.juz-card{background:var(--green);border:1px solid var(--border);border-radius:10px;padding:10px}
+.juz-card.done{border-color:var(--accent)}
+.juz-card.pending{border-color:#c9a227}
+.juz-title{font-weight:700;font-size:14px;color:var(--primary);display:flex;justify-content:space-between;margin-bottom:4px}
+.juz-mini-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin:4px 0}
+.juz-mini-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .4s}
+.juz-info{font-size:10px;color:var(--dim);display:flex;justify-content:space-between}
+label{display:block;font-size:11px;font-weight:700;color:var(--primary);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}
+input,select{width:100%;padding:11px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;background:var(--card);color:var(--text)}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+button{padding:12px 18px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+button:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;width:100%;margin-top:14px;box-shadow:0 2px 10px rgba(201,162,39,.25);border:1px solid var(--accent)}
+body.dark .btn-primary{color:#1a1208}
+.btn-danger{background:#ffe5e5;color:#c0392b;padding:6px 10px;font-size:12px}
+.btn-small{background:var(--green);color:var(--primary);padding:9px 14px;font-size:13px;border:1px solid var(--border)}
+.entry{padding:12px;background:var(--green);border-radius:10px;margin-bottom:8px;border-left:4px solid var(--accent);display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.entry.sabqi{border-left-color:#4d9eff}
+.entry.manzil{border-left-color:#ff9d4d}
+.entry-main{flex:1;min-width:0}
+.entry-title{font-weight:700;font-size:14px;color:var(--primary)}
+.entry-detail{font-size:11px;color:var(--dim);margin-top:2px}
+.entry-lines{font-weight:700;color:var(--primary);font-size:15px}
+.timer-display{font-size:52px;text-align:center;font-weight:700;color:var(--primary);padding:20px 0;font-family:'Courier New',monospace;letter-spacing:2px}
+.timer-buttons{display:flex;gap:8px;justify-content:center}
+.timer-buttons button{flex:1;max-width:140px}
+.dua{background:var(--green);border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border);border-left:4px solid var(--accent)}
+.dua h3{font-size:13px;color:var(--primary);margin-bottom:8px}
+.dua-arabic{font-size:20px;direction:rtl;text-align:right;line-height:1.9;font-family:'Amiri','Noto Naskh Arabic','Traditional Arabic',serif;color:var(--primary);margin-bottom:8px}
+body.dark .dua-arabic{color:#e8d48a}
+.dua-translit{font-size:12px;color:var(--dim);font-style:italic;line-height:1.5}
+.empty{text-align:center;color:var(--dim);padding:30px;font-size:13px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px;text-transform:uppercase}
+.badge-naya{background:#eaf5dc;color:#0d5c4a}
+.badge-sabqi{background:#d4e6ff;color:#1a5fb4}
+.badge-manzil{background:#ffe4d4;color:#b85d1a}
+body.dark .badge-naya{background:rgba(34,199,122,.18);color:#6ee0a0}
+body.dark .badge-sabqi{background:rgba(77,158,255,.18);color:#7db8ff}
+body.dark .badge-manzil{background:rgba(255,157,77,.18);color:#ffb87a}
+.footer-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.footer-actions button{flex:1;min-width:110px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(13,92,74,.4);border:1px solid var(--accent);transition:transform .3s;z-index:1000;max-width:90%;text-align:center}
+body.dark .toast{color:#1a1208}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.graph-wrap{position:relative;width:100%;overflow-x:auto}
+#lineGraph{display:block;max-width:100%;height:auto}
+.quran-juz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}
+.quran-juz-card{background:var(--green);border:2px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;position:relative}
+.quran-juz-card:active{transform:scale(.97)}
+.quran-juz-card.has-photos{border-color:var(--accent);background:linear-gradient(135deg,var(--green),rgba(201,162,39,.14));box-shadow:0 2px 10px rgba(201,162,39,.22)}
+.quran-juz-card .juz-num{font-size:20px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.quran-juz-card .juz-sub{font-size:10px;color:var(--dim);margin-bottom:6px}
+.quran-juz-card .photo-badge{display:inline-block;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid var(--accent)}
+body.dark .quran-juz-card .photo-badge{color:#1a1208}
+.quran-juz-card .photo-badge.empty-badge{background:var(--border);color:var(--dim);border-color:transparent}
+.quran-juz-card .juz-progress{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px}
+.quran-juz-card .juz-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .4s}
+.juz-detail-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.back-btn{background:var(--green);border:1px solid var(--border);color:var(--primary);padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.juz-detail-title{font-size:18px;font-weight:700;color:var(--primary);flex:1}
+.juz-detail-title small{display:block;font-size:11px;color:var(--dim);font-weight:400}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.photo-thumb{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--green);cursor:pointer;border:1px solid var(--accent)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb .photo-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(13,92,74,.9),transparent);color:#f5e6b8;padding:14px 6px 6px;font-size:10px;font-weight:600;text-align:center}
+.photo-viewer{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.photo-viewer img{max-width:100%;max-height:85vh;object-fit:contain}
+.photo-viewer .close-btn{position:absolute;top:16px;right:16px;background:rgba(201,162,39,.3);color:#fff;border:1px solid var(--accent);width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer}
+.photo-viewer .info{color:#f5e6b8;padding:14px;text-align:center;font-size:14px}
+.upload-zone{border:2px dashed var(--accent);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;background:var(--green);margin-bottom:12px}
+.upload-zone .icon{font-size:34px;margin-bottom:6px}
+.upload-zone .txt{font-size:13px;color:var(--primary);font-weight:600}
+.upload-zone .sub{font-size:11px;color:var(--dim);margin-top:2px}
+.achievements{display:flex;gap:8px;flex-wrap:wrap}
+.ach{flex:1;min-width:100px;padding:10px;background:var(--green);border-radius:10px;border:2px solid var(--border);text-align:center;opacity:.4;transition:all .3s}
+.ach.unlocked{opacity:1;border-color:var(--accent);background:linear-gradient(135deg,var(--green),rgba(201,162,39,.12))}
+.ach .ico{font-size:22px}
+.ach .lbl{font-size:10px;color:var(--primary);font-weight:700;margin-top:4px}
+.search-box{display:flex;gap:8px;margin-bottom:10px}
+.search-box input{flex:1}
+.audio-links{display:flex;gap:6px;flex-wrap:wrap}
+.audio-links a{padding:8px 12px;background:var(--green);border:1px solid var(--accent);border-radius:8px;text-decoration:none;font-size:12px;color:var(--primary);font-weight:600}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-row .label{font-size:14px;font-weight:600;color:var(--text)}
+.setting-row .desc{font-size:11px;color:var(--dim);margin-top:2px}
+.switch{position:relative;width:46px;height:26px;background:var(--border);border-radius:13px;cursor:pointer;transition:background .2s}
+.switch.on{background:linear-gradient(135deg,var(--primary),var(--accent))}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}
+.switch.on::after{transform:translateX(20px)}
+@media(max-width:480px){.header h1{font-size:17px}.stat .num{font-size:18px}.timer-display{font-size:42px}.quran-juz-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>📖 Noor-al-Ikram</h1>
+    <p id="subtitle">Bismillah — hifz ka safar</p>
+  </div>
+  <button class="icon-btn" onclick="toggleDark()" id="darkBtn">🌙</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-page="dashboard">📊 Home</div>
+  <div class="tab" data-page="log">✍️ Sabaq</div>
+  <div class="tab" data-page="timer">⏱️ Timer</div>
+  <div class="tab" data-page="graph">📈 Graph</div>
+  <div class="tab" data-page="photos">📸 Quran</div>
+  <div class="tab" data-page="history">📅 History</div>
+  <div class="tab" data-page="duain">🤲 Duain</div>
+  <div class="tab" data-page="settings">⚙️ Settings</div>
+</div>
+
+<div class="page active" id="dashboard">
+  <div class="card">
+    <h2>Overall <span class="sub">14 Juz (13–26)</span></h2>
+    <div class="stats">
+      <div class="stat"><div class="num" id="statDone">0</div><div class="lbl">Lines Yaad</div></div>
+      <div class="stat"><div class="num" id="statLeft">4200</div><div class="lbl">Lines Baki</div></div>
+      <div class="stat"><div class="num" id="statDays">0</div><div class="lbl">Din Kaam</div></div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="overallFill" style="width:0%"></div>
+      <div class="progress-text" id="overallText">0%</div>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin-top:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+      <span>Aaj: <b id="todayLines" style="color:var(--primary)">0</b> lines</span>
+      <span>🔥 <b id="streak" style="color:var(--primary)">0</b> din</span>
+      <span>🎯 <b id="targetDate" style="color:var(--primary)">—</b></span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>🏆 Achievements</h2>
+    <div class="achievements" id="achievements"></div>
+  </div>
+  <div class="card">
+    <h2>Har Juz ka Haal</h2>
+    <div class="juz-grid" id="juzGrid"></div>
+  </div>
+  <div class="card">
+    <h2>🎧 Tilawat</h2>
+    <div style="font-size:13px;color:var(--dim);margin-bottom:10px">Sunna hifz ko strong karta hai. Rozana 30 min suno.</div>
+    <div class="audio-links" id="audioLinks"></div>
+  </div>
+</div>
+
+<div class="page" id="log">
+  <div class="card">
+    <h2>📝 Sabaq Likho</h2>
+    <label>Tarikh</label>
+    <input type="date" id="logDate">
+    <label>Juz</label>
+    <select id="logJuz"></select>
+    <label>Kitni Lines?</label>
+    <input type="number" id="logLines" placeholder="misal: 10" min="1">
+    <label>Qism</label>
+    <select id="logType">
+      <option value="naya">Naya (new memorization)</option>
+      <option value="sabqi">Sabqi (pichle 7 din)</option>
+      <option value="manzil">Manzil (purana revision)</option>
+    </select>
+    <label>Note (optional)</label>
+    <input type="text" id="logNote" placeholder="misal: Surah Yusuf 1-10">
+    <button class="btn-primary" onclick="addEntry()">➕ Save Karo</button>
+  </div>
+  <div class="card" style="background:var(--green)">
+    <div style="font-size:13px;color:var(--primary);line-height:1.7">
+      💡 <b>Rozana target:</b> 10 lines naya<br>
+      🎯 <b>Aaj baki:</b> <span id="todayRemaining" style="font-weight:bold">10</span> lines<br>
+      📿 <b>Sabqi:</b> 30 min &nbsp;|&nbsp; 🕰️ <b>Manzil:</b> 30 min
+    </div>
+  </div>
+</div>
+
+<div class="page" id="timer">
+  <div class="card">
+    <h2>⏱️ Session Timer</h2>
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div class="timer-buttons">
+      <button class="btn-primary" style="margin-top:0" onclick="toggleTimer()" id="timerBtn">▶ Start</button>
+      <button class="btn-small" onclick="resetTimer()">⟲ Reset</button>
+    </div>
+    <label style="margin-top:16px">Juz</label>
+    <select id="timerJuz"></select>
+    <label>Qism</label>
+    <select id="timerType">
+      <option value="naya">Naya</option>
+      <option value="sabqi">Sabqi</option>
+      <option value="manzil">Manzil</option>
+    </select>
+    <label>Lines</label>
+    <input type="number" id="timerLines" placeholder="Lines" min="1">
+    <button class="btn-primary" onclick="saveTimerSession()">💾 Save Session</button>
+  </div>
+</div>
+
+<div class="page" id="graph">
+  <div class="card">
+    <h2>📈 Pichle 21 Din <span class="sub" id="graphTotal"></span></h2>
+    <div class="graph-wrap"><canvas id="lineGraph"></canvas></div>
+    <div style="display:flex;gap:12px;margin-top:12px;font-size:12px;justify-content:center;flex-wrap:wrap">
+      <span><span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:3px"></span> Naya</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#4d9eff;border-radius:3px"></span> Sabqi</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#ff9d4d;border-radius:3px"></span> Manzil</span>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--dim);display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>📊 Average: <b id="avgLines" style="color:var(--primary)">0</b></div>
+      <div>📅 Sabse zyada: <b id="maxLines" style="color:var(--primary)">0</b></div>
+      <div>✅ Total: <b id="total21" style="color:var(--primary)">0</b></div>
+      <div>🎯 Target tak: <b id="daysLeft" style="color:var(--primary)">—</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="photos">
+  <div id="quranJuzListView">
+    <div class="card">
+      <h2>📸 Quran ke Pages <span class="sub" id="totalPhotoCount"></span></h2>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:12px;line-height:1.6">
+        Jis juz par tap karo, us juz ke pages add karo.
+      </div>
+      <div class="quran-juz-grid" id="quranJuzGrid"></div>
+    </div>
+  </div>
+  <div id="quranJuzDetailView" class="hidden">
+    <div class="card">
+      <div class="juz-detail-header">
+        <button class="back-btn" onclick="closeJuzPhotos()">← Wapas</button>
+        <div class="juz-detail-title" id="juzDetailTitle">Juz 13<small id="juzDetailSub">0 photos</small></div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('photoInput').click()">
+        <div class="icon">📷</div>
+        <div class="txt">Is Juz me Photo Add Karo</div>
+        <div class="sub">Camera ya Gallery · Multiple select</div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+      <div id="photoGrid" class="photo-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="history">
+  <div class="card">
+    <h2>📅 Entries <span class="sub" id="historyCount"></span></h2>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="Juz, note ya date..." oninput="renderHistory()"></div>
+    <div id="historyList"></div>
+    <div class="footer-actions">
+      <button class="btn-small" onclick="exportData()">⬇ Backup</button>
+      <button class="btn-small" onclick="document.getElementById('importFile').click()">⬆ Restore</button>
+      <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+      <button class="btn-danger" style="flex:1;min-width:110px;padding:9px 14px" onclick="clearAll()">🗑 Sab Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="duain">
+  <div class="card">
+    <h2>🤲 Rozana ki Duain</h2>
+    <div class="dua"><h3>1. Hifz shuru karne se pehle</h3><div class="dua-arabic">رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي يَفْقَهُوا قَوْلِي</div><div class="dua-translit">Rabbi-shrah li sadri wa yassir li amri wahlul ‘uqdatam min lisani yafqahu qawli.</div></div>
+    <div class="dua"><h3>2. Ilm aur hifz ke liye</h3><div class="dua-arabic">رَبِّ زِدْنِي عِلْمًا</div><div class="dua-translit">Rabbi zidni ‘ilma.</div><div class="dua-arabic" style="margin-top:10px;font-size:17px">اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا</div><div class="dua-translit">Allahumma inni as’aluka ‘ilman nafi’an wa rizqan tayyiban wa ‘amalan mutaqabbalan.</div></div>
+    <div class="dua"><h3>3. Gham aur tension ke liye</h3><div class="dua-arabic" style="font-size:16px">اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ وَالْبُخْلِ وَالْجُبْنِ وَضَلَعِ الدَّيْنِ وَقَهْرِ الرِّجَالِ</div><div class="dua-translit">Allahumma inni a’udhu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dala’id-dayni wa qahrir-rijal.</div></div>
+    <div class="dua"><h3>4. Rizq aur business ke liye</h3><div class="dua-arabic" style="font-size:16px">اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ</div><div class="dua-translit">Allahumma ikfini bi halalika ‘an haramika wa aghnini bi fadlika ‘amman siwaka.</div></div>
+    <div class="dua"><h3>5. Shaadi ke liye</h3><div class="dua-arabic">رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا</div><div class="dua-translit">Rabbana hab lana min azwajina wa dhurriyyatina qurrata a’yunin waj’alna lil-muttaqina imama.</div></div>
+    <div class="dua"><h3>6. Maa baap ke liye</h3><div class="dua-arabic">رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا</div><div class="dua-translit">Rabbir hamhuma kama rabbayani saghira.</div></div>
+    <div class="dua"><h3>7. Dil ko saabit rakhne ke liye</h3><div class="dua-arabic">يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ</div><div class="dua-translit">Ya Muqallibal-qulub, thabbit qalbi ‘ala dinik.</div></div>
+    <div class="dua"><h3>8. Sayyidul Istighfar</h3><div class="dua-arabic" style="font-size:15px">اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ</div><div class="dua-translit">Allahumma anta Rabbi la ilaha illa anta, khalaqtani wa ana ‘abduka...</div></div>
+    <div class="dua"><h3>9. Quran yaad rakhne ke liye</h3><div class="dua-arabic" style="font-size:15px">اللَّهُمَّ ارْحَمْنِي بِالْقُرْآنِ، وَاجْعَلْهُ لِي إِمَامًا وَنُورًا وَهُدًى وَرَحْمَةً، اللَّهُمَّ ذَكِّرْنِي مِنْهُ مَا نَسِيتُ، وَعَلِّمْنِي مِنْهُ مَا جَهِلْتُ، وَارْزُقْنِي تِلَاوَتَهُ آنَاءَ اللَّيْلِ وَأَطْرَافَ النَّهَارِ، وَاجْعَلْهُ لِي حُجَّةً يَا رَبَّ الْعَالَمِينَ</div><div class="dua-translit">Allahumma arhamni bil-Quran, waj’alhu li imaman wa nuran wa hudan wa rahmah...</div></div>
+    <div class="dua"><h3>10. Hifz mukammal karne ke liye</h3><div class="dua-arabic">اللَّهُمَّ أَعِنِّي عَلَى حِفْظِ كِتَابِكَ وَتِلَاوَتِهِ عَلَى وَجْهِهِ وَحُسْنِ تِلَاوَتِهِ</div><div class="dua-translit">Allahumma a’inni ‘ala hifzi kitabika wa tilawatihi ‘ala wajhihi wa husni tilawatih.</div></div>
+  </div>
+</div>
+
+<div class="page" id="settings">
+  <div class="card">
+    <h2>⚙️ Settings</h2>
+    <div class="setting-row">
+      <div><div class="label">🌙 Dark Mode</div><div class="desc">Raat me aankhon ko aaram</div></div>
+      <div class="switch" id="darkSwitch" onclick="toggleDark()"></div>
+    </div>
+    <div class="setting-row">
+      <div><div class="label">🔔 Daily Reminder</div><div class="desc">Rozana waqt par yaad dilaye</div></div>
+      <div class="switch" id="reminderSwitch" onclick="toggleReminder()"></div>
+    </div>
+    <div style="margin-top:12px"><label>Reminder Waqt</label><input type="time" id="reminderTime" value="06:00" onchange="saveReminderTime()"></div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><label>Rozana Target (lines)</label><input type="number" id="dailyTargetInput" value="10" min="1" max="100" onchange="saveDailyTarget()"></div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><label>App Naam</label><input type="text" id="appNameInput" value="Noor-al-Ikram" onchange="saveAppName()"></div>
+  </div>
+  <div class="card">
+    <h2>💾 Data</h2>
+    <div class="footer-actions">
+      <button class="btn-small" onclick="exportData()">⬇ Backup</button>
+      <button class="btn-small" onclick="document.getElementById('importFile2').click()">⬆ Restore</button>
+      <input type="file" id="importFile2" style="display:none" accept=".json" onchange="importData(event)">
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin-top:10px;line-height:1.6">⚠️ <b>Zaroori:</b> Hafte me ek baar backup lo. Sab data JSON file me aa jayega.</div>
+  </div>
+  <div class="card">
+    <h2>ℹ️ About</h2>
+    <div style="font-size:13px;line-height:1.8;color:var(--dim)">
+      <b style="color:var(--primary)">Noor-al-Ikram</b> · v1.2<br>
+      Aapka personal hifz companion.<br><br>
+      <i>"Rabbi zidni ilma"</i>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-/* ============================================================
-   NOOR-AL-IKRAM v1.2 — Complete Script (fixed)
-   ============================================================ */
+const ENTRIES_KEY='nai_entries_v1';
+const SETTINGS_KEY='nai_settings_v1';
+const PHOTO_DB='NoorAlIkramDB';
+const PHOTO_STORE='photos';
+const LINES_PER_JUZ=300;
+const TARGET_JUZ=[13,14,15,16,17,18,19,20,21,22,23,24,25,26];
 
-const ENTRIES_KEY = 'nai_entries_v1';
-const SETTINGS_KEY = 'nai_settings_v1';
-const PHOTO_DB = 'NoorAlIkramDB';
-const PHOTO_STORE = 'photos';
-const LINES_PER_JUZ = 300;
-const TARGET_JUZ = [13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+let state={entries:[]};
+let settings={dark:false,reminder:false,reminderTime:'06:00',dailyTarget:10,appName:'Noor-al-Ikram'};
+let photoDB=null;
+let timerInterval=null,timerSeconds=0,timerRunning=false;
+let currentPhotoJuz=null;
 
-let state = { entries: [] };
-let settings = {
-  dark: false,
-  reminder: false,
-  reminderTime: '06:00',
-  dailyTarget: 10,
-  appName: 'Noor-al-Ikram'
-};
-let photoDB = null;
-let deferredPrompt = null;
-let timerInterval = null, timerSeconds = 0, timerRunning = false;
-let currentPhotoJuz = null;
+const $=id=>document.getElementById(id);
+const $$=sel=>document.querySelectorAll(sel);
 
-const $ = id => document.getElementById(id);
-const $$ = sel => document.querySelectorAll(sel);
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateFromStr(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function fmtDate(s){const days=['Itwaar','Peer','Mangal','Budh','Jumeraat','Jumma','Hafta'];const dt=dateFromStr(s);return dt.getDate()+'/'+(dt.getMonth()+1)+'/'+dt.getFullYear()+' ('+days[dt.getDay()]+')';}
+function toast(msg,ms){ms=ms||2200;const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),ms);}
 
-function todayStr() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-function dateFromStr(s) {
-  const [y,m,d] = s.split('-').map(Number);
-  return new Date(y, m-1, d);
-}
-function fmtDate(s) {
-  const days = ['Itwaar','Peer','Mangal','Budh','Jumeraat','Jumma','Hafta'];
-  const dt = dateFromStr(s);
-  return `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()} (${days[dt.getDay()]})`;
-}
-function toast(msg, ms = 2200) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), ms);
-}
+function loadLocal(){try{const e=localStorage.getItem(ENTRIES_KEY);if(e)state.entries=JSON.parse(e);const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=Object.assign(settings,JSON.parse(s));}catch(err){console.error(err);}}
+function saveLocal(){localStorage.setItem(ENTRIES_KEY,JSON.stringify(state.entries));localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
 
-/* ---------- STORAGE ---------- */
-function loadLocal() {
-  try {
-    const e = localStorage.getItem(ENTRIES_KEY);
-    if (e) state.entries = JSON.parse(e);
-    const s = localStorage.getItem(SETTINGS_KEY);
-    if (s) settings = Object.assign(settings, JSON.parse(s));
-  } catch(err) { console.error(err); }
-}
-function saveLocal() {
-  localStorage.setItem(ENTRIES_KEY, JSON.stringify(state.entries));
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
+function openPhotoDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(PHOTO_DB,1);req.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(PHOTO_STORE)){const store=db.createObjectStore(PHOTO_STORE,{keyPath:'id'});store.createIndex('juz','juz',{unique:false});}};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+function dbAdd(photo){return new Promise((resolve,reject)=>{const tx=photoDB.transaction(PHOTO_STORE,'readwrite');const req=tx.objectStore(PHOTO_STORE).put(photo);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+function dbGetAll(){return new Promise((resolve,reject)=>{const tx=photoDB.transaction(PHOTO_STORE,'readonly');const req=tx.objectStore(PHOTO_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);});}
+function dbDelete(id){return new Promise((resolve,reject)=>{const tx=photoDB.transaction(PHOTO_STORE,'readwrite');const req=tx.objectStore(PHOTO_STORE).delete(id);req.onsuccess=()=>resolve();req.onerror=()=>reject(req.error);});}
 
-/* ---------- INDEXEDDB ---------- */
-function openPhotoDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(PHOTO_DB, 1);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(PHOTO_STORE)) {
-        const store = db.createObjectStore(PHOTO_STORE, { keyPath: 'id' });
-        store.createIndex('juz', 'juz', { unique: false });
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-function dbAdd(photo) {
-  return new Promise((resolve, reject) => {
-    const tx = photoDB.transaction(PHOTO_STORE, 'readwrite');
-    const req = tx.objectStore(PHOTO_STORE).put(photo);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-function dbGetAll() {
-  return new Promise((resolve, reject) => {
-    const tx = photoDB.transaction(PHOTO_STORE, 'readonly');
-    const req = tx.objectStore(PHOTO_STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-}
-function dbDelete(id) {
-  return new Promise((resolve, reject) => {
-    const tx = photoDB.transaction(PHOTO_STORE, 'readwrite');
-    const req = tx.objectStore(PHOTO_STORE).delete(id);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
+function compressImage(file,maxWidth,quality){maxWidth=maxWidth||1400;quality=quality||0.85;return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height;if(w>maxWidth){h=Math.round((maxWidth/w)*h);w=maxWidth;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',quality));};img.onerror=reject;img.src=e.target.result;};reader.onerror=reject;reader.readAsDataURL(file);});}
 
-/* ---------- IMAGE COMPRESS ---------- */
-function compressImage(file, maxWidth = 1400, quality = 0.85) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        if (width > maxWidth) {
-          height = Math.round((maxWidth / width) * height);
-          width = maxWidth;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+$$('.tab').forEach(tab=>{tab.addEventListener('click',()=>{$$('.tab').forEach(t=>t.classList.remove('active'));$$('.page').forEach(p=>p.classList.remove('active'));tab.classList.add('active');$(tab.dataset.page).classList.add('active');if(tab.dataset.page==='dashboard'){renderDashboard();renderAchievements();renderAudioLinks();}if(tab.dataset.page==='history')renderHistory();if(tab.dataset.page==='log')updateTodayRemaining();if(tab.dataset.page==='graph')renderGraph();if(tab.dataset.page==='photos'){currentPhotoJuz=null;renderQuranView();}});});
 
-/* ---------- TABS ---------- */
-$$('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    $$('.tab').forEach(t => t.classList.remove('active'));
-    $$('.page').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    $(tab.dataset.page).classList.add('active');
-    if (tab.dataset.page === 'dashboard') { renderDashboard(); renderAchievements(); renderAudioLinks(); }
-    if (tab.dataset.page === 'history') renderHistory();
-    if (tab.dataset.page === 'log') updateTodayRemaining();
-    if (tab.dataset.page === 'graph') renderGraph();
-    if (tab.dataset.page === 'photos') { currentPhotoJuz = null; renderQuranView(); }
-  });
-});
+function toggleDark(){settings.dark=!settings.dark;applyDark();saveLocal();}
+function applyDark(){document.body.classList.toggle('dark',settings.dark);$('darkBtn').textContent=settings.dark?'☀️':'🌙';$('darkSwitch').classList.toggle('on',settings.dark);if(document.querySelector('.page.active').id==='graph')renderGraph();}
 
-/* ---------- DARK MODE ---------- */
-function toggleDark() {
-  settings.dark = !settings.dark;
-  applyDark();
-  saveLocal();
-}
-function applyDark() {
-  document.body.classList.toggle('dark', settings.dark);
-  $('darkBtn').textContent = settings.dark ? '☀️' : '🌙';
-  $('darkSwitch').classList.toggle('on', settings.dark);
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', settings.dark ? '#0a1811' : '#0d5c4a');
-  if (document.querySelector('.page.active').id === 'graph') renderGraph();
-}
+function toggleReminder(){settings.reminder=!settings.reminder;$('reminderSwitch').classList.toggle('on',settings.reminder);saveLocal();if(settings.reminder&&'Notification'in window){if(Notification.permission!=='granted'){Notification.requestPermission().then(p=>{if(p==='granted')toast('✅ Reminder on!');else{settings.reminder=false;$('reminderSwitch').classList.remove('on');saveLocal();toast('⚠️ Permission nahi mili');}});}else toast('✅ Reminder on!');}}
+function saveReminderTime(){settings.reminderTime=$('reminderTime').value;saveLocal();}
+function checkReminder(){if(!settings.reminder)return;const now=new Date();const hh=String(now.getHours()).padStart(2,'0');const mm=String(now.getMinutes()).padStart(2,'0');const nowStr=hh+':'+mm;if(nowStr===settings.reminderTime){const last=localStorage.getItem('nai_last_reminder');if(last!==todayStr()){localStorage.setItem('nai_last_reminder',todayStr());if(Notification.permission==='granted'){new Notification('📖 Noor-al-Ikram',{body:'Aaj ka sabaq baaki hai!'});}}}}
+setInterval(checkReminder,30000);
 
-/* ---------- REMINDER ---------- */
-function toggleReminder() {
-  settings.reminder = !settings.reminder;
-  $('reminderSwitch').classList.toggle('on', settings.reminder);
-  saveLocal();
-  if (settings.reminder && 'Notification' in window) {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission().then(p => {
-        if (p === 'granted') toast('✅ Reminder on!');
-        else { settings.reminder = false; $('reminderSwitch').classList.remove('on'); saveLocal(); toast('⚠️ Permission nahi mili'); }
-      });
-    } else toast('✅ Reminder on!');
-  }
-}
-function saveReminderTime() {
-  settings.reminderTime = $('reminderTime').value;
-  saveLocal();
-}
-function checkReminder() {
-  if (!settings.reminder) return;
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  const nowStr = `${hh}:${mm}`;
-  if (nowStr === settings.reminderTime) {
-    const last = localStorage.getItem('nai_last_reminder');
-    if (last !== todayStr()) {
-      localStorage.setItem('nai_last_reminder', todayStr());
-      if (Notification.permission === 'granted') {
-        new Notification('📖 Noor-al-Ikram', { body: 'Aaj ka sabaq baaki hai. Utho, hifz ka waqt ho gaya!' });
-      }
-    }
-  }
-}
-setInterval(checkReminder, 30000);
+function saveDailyTarget(){settings.dailyTarget=parseInt($('dailyTargetInput').value)||10;saveLocal();renderDashboard();updateTodayRemaining();}
+function saveAppName(){settings.appName=$('appNameInput').value.trim()||'Noor-al-Ikram';$('subtitle').textContent=settings.appName;document.querySelector('.header h1').textContent='📖 '+settings.appName;saveLocal();}
 
-/* ---------- SETTINGS ---------- */
-function saveDailyTarget() {
-  settings.dailyTarget = parseInt($('dailyTargetInput').value) || 10;
-  saveLocal();
-  renderDashboard();
-  updateTodayRemaining();
-}
-function saveAppName() {
-  settings.appName = $('appNameInput').value.trim() || 'Noor-al-Ikram';
-  $('subtitle').textContent = settings.appName;
-  document.querySelector('.header h1').textContent = '📖 ' + settings.appName;
-  saveLocal();
-}
+function fillJuzSelects(){let html='';for(let i=1;i<=30;i++){const mark=TARGET_JUZ.includes(i)?' ⭐':'';html+='<option value="'+i+'">Juz '+i+mark+'</option>';}$('logJuz').innerHTML=html;$('timerJuz').innerHTML=html;$('logJuz').value=13;$('timerJuz').value=13;}
 
-/* ---------- JUZ SELECTS ---------- */
-function fillJuzSelects() {
-  let html = '';
-  for (let i=1; i<=30; i++) {
-    const mark = TARGET_JUZ.includes(i) ? ' ⭐' : '';
-    html += `<option value="${i}">Juz ${i}${mark}</option>`;
-  }
-  $('logJuz').innerHTML = html;
-  $('timerJuz').innerHTML = html;
-  $('logJuz').value = 13;
-  $('timerJuz').value = 13;
-}
+function addEntry(){const date=$('logDate').value;const juz=parseInt($('logJuz').value);const lines=parseInt($('logLines').value);const type=$('logType').value;const note=$('logNote').value.trim();if(!date||!juz||!lines||lines<=0){toast('⚠️ Sab fields bharein');return;}state.entries.push({id:Date.now()+Math.random(),date:date,juz:juz,lines:lines,type:type,note:note});saveLocal();$('logLines').value='';$('logNote').value='';toast('✅ Save ho gaya!');renderDashboard();renderAchievements();updateTodayRemaining();}
+function deleteEntry(id){if(!confirm('Ye entry delete?'))return;state.entries=state.entries.filter(e=>String(e.id)!==String(id));saveLocal();renderHistory();renderDashboard();renderAchievements();updateTodayRemaining();}
+function clearAll(){if(!confirm('SAB entries delete ho jayengi. Pakka?'))return;state.entries=[];saveLocal();renderHistory();renderDashboard();renderAchievements();toast('🗑 Delete ho gayi');}
 
-/* ---------- ENTRIES ---------- */
-function addEntry() {
-  const date = $('logDate').value;
-  const juz = parseInt($('logJuz').value);
-  const lines = parseInt($('logLines').value);
-  const type = $('logType').value;
-  const note = $('logNote').value.trim();
-  if (!date || !juz || !lines || lines <= 0) { toast('⚠️ Sab fields bharein'); return; }
-  state.entries.push({ id: Date.now() + Math.random(), date, juz, lines, type, note });
-  saveLocal();
-  $('logLines').value = '';
-  $('logNote').value = '';
-  toast('✅ Save ho gaya!');
-  renderDashboard();
-  renderAchievements();
-  updateTodayRemaining();
-}
-function deleteEntry(id) {
-  if (!confirm('Ye entry delete?')) return;
-  state.entries = state.entries.filter(e => String(e.id) !== String(id));
-  saveLocal();
-  renderHistory();
-  renderDashboard();
-  renderAchievements();
-  updateTodayRemaining();
-}
-function clearAll() {
-  if (!confirm('SAB entries delete ho jayengi. Pakka?')) return;
-  if (!confirm('Photos safe rahengi. Sirf entries hatengi. Backup liya hai?')) return;
-  state.entries = [];
-  saveLocal();
-  renderHistory();
-  renderDashboard();
-  renderAchievements();
-  toast('🗑 Entries delete ho gayi');
-}
+function getJuzProgress(juz){return state.entries.filter(e=>e.juz===juz&&e.type==='naya').reduce((s,e)=>s+e.lines,0);}
+function getStreak(){const dates=new Set(state.entries.map(e=>e.date));let streak=0;let check=new Date();for(let k=0;k<365;k++){const ds=check.getFullYear()+'-'+String(check.getMonth()+1).padStart(2,'0')+'-'+String(check.getDate()).padStart(2,'0');if(dates.has(ds)){streak++;check.setDate(check.getDate()-1);}else if(k===0){check.setDate(check.getDate()-1);}else break;}return streak;}
 
-/* ---------- DASHBOARD ---------- */
-function getJuzProgress(juz) {
-  return state.entries
-    .filter(e => e.juz === juz && e.type === 'naya')
-    .reduce((s, e) => s + e.lines, 0);
-}
-function getStreak() {
-  const dates = new Set(state.entries.map(e => e.date));
-  let streak = 0;
-  let check = new Date();
-  for (let k=0; k<365; k++) {
-    const ds = check.getFullYear() + '-' + String(check.getMonth()+1).padStart(2,'0') + '-' + String(check.getDate()).padStart(2,'0');
-    if (dates.has(ds)) { streak++; check.setDate(check.getDate()-1); }
-    else if (k === 0) { check.setDate(check.getDate()-1); }
-    else break;
-  }
-  return streak;
-}
-function renderDashboard() {
-  let totalDone = 0;
-  TARGET_JUZ.forEach(j => totalDone += getJuzProgress(j));
-  const totalTarget = TARGET_JUZ.length * LINES_PER_JUZ;
-  const left = Math.max(0, totalTarget - totalDone);
-  const pct = Math.min(100, (totalDone / totalTarget) * 100);
-  $('statDone').textContent = totalDone;
-  $('statLeft').textContent = left;
-  $('statDays').textContent = new Set(state.entries.map(e=>e.date)).size;
-  $('overallFill').style.width = pct + '%';
-  $('overallText').textContent = pct.toFixed(1) + '%';
-  const today = todayStr();
-  const todayLines = state.entries.filter(e => e.date === today).reduce((s,e) => s + e.lines, 0);
-  $('todayLines').textContent = todayLines;
-  $('streak').textContent = getStreak();
+function renderDashboard(){let totalDone=0;TARGET_JUZ.forEach(j=>totalDone+=getJuzProgress(j));const totalTarget=TARGET_JUZ.length*LINES_PER_JUZ;const left=Math.max(0,totalTarget-totalDone);const pct=Math.min(100,(totalDone/totalTarget)*100);$('statDone').textContent=totalDone;$('statLeft').textContent=left;$('statDays').textContent=new Set(state.entries.map(e=>e.date)).size;$('overallFill').style.width=pct+'%';$('overallText').textContent=pct.toFixed(1)+'%';const today=todayStr();const todayLines=state.entries.filter(e=>e.date===today).reduce((s,e)=>s+e.lines,0);$('todayLines').textContent=todayLines;$('streak').textContent=getStreak();const days=new Set(state.entries.map(e=>e.date)).size||1;const avg=totalDone/days||settings.dailyTarget;const remainingDays=Math.ceil(left/Math.max(1,avg));const targetDate=new Date();targetDate.setDate(targetDate.getDate()+remainingDays);$('targetDate').textContent=targetDate.getDate()+'/'+(targetDate.getMonth()+1)+'/'+String(targetDate.getFullYear()).slice(2);const grid=$('juzGrid');let gHtml='';TARGET_JUZ.forEach(j=>{const done=getJuzProgress(j);const leftJ=Math.max(0,LINES_PER_JUZ-done);const p=Math.min(100,(done/LINES_PER_JUZ)*100);const cls=done>=LINES_PER_JUZ?'done':(done>0?'pending':'');gHtml+='<div class="juz-card '+cls+'"><div class="juz-title"><span>Juz '+j+'</span><span>'+done+'/'+LINES_PER_JUZ+'</span></div><div class="juz-mini-bar"><div class="juz-mini-fill" style="width:'+p+'%"></div></div><div class="juz-info"><span>Baki: '+leftJ+'</span><span>'+p.toFixed(0)+'%</span></div></div>';});grid.innerHTML=gHtml;}
 
-  const days = new Set(state.entries.map(e=>e.date)).size || 1;
-  const avg = totalDone / days || settings.dailyTarget;
-  const remainingDays = Math.ceil(left / Math.max(1, avg));
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + remainingDays);
-  $('targetDate').textContent = `${targetDate.getDate()}/${targetDate.getMonth()+1}/${String(targetDate.getFullYear()).slice(2)}`;
+function updateTodayRemaining(){const today=todayStr();const todayNaya=state.entries.filter(e=>e.date===today&&e.type==='naya').reduce((s,e)=>s+e.lines,0);const remain=Math.max(0,settings.dailyTarget-todayNaya);$('todayRemaining').textContent=remain;}
 
-  const grid = $('juzGrid');
-  let gHtml = '';
-  TARGET_JUZ.forEach(j => {
-    const done = getJuzProgress(j);
-    const leftJ = Math.max(0, LINES_PER_JUZ - done);
-    const p = Math.min(100, (done / LINES_PER_JUZ) * 100);
-    const cls = done >= LINES_PER_JUZ ? 'done' : (done > 0 ? 'pending' : '');
-    gHtml += `<div class="juz-card ${cls}">
-      <div class="juz-title"><span>Juz ${j}</span><span>${done}/${LINES_PER_JUZ}</span></div>
-      <div class="juz-mini-bar"><div class="juz-mini-fill" style="width:${p}%"></div></div>
-      <div class="juz-info"><span>Baki: ${leftJ}</span><span>${p.toFixed(0)}%</span></div>
-    </div>`;
-  });
-  grid.innerHTML = gHtml;
-}
-function updateTodayRemaining() {
-  const today = todayStr();
-  const todayNaya = state.entries
-    .filter(e => e.date === today && e.type === 'naya')
-    .reduce((s,e) => s + e.lines, 0);
-  const remain = Math.max(0, settings.dailyTarget - todayNaya);
-  $('todayRemaining').textContent = remain;
-}
-function renderAchievements() {
-  const totalDone = TARGET_JUZ.reduce((s,j) => s + getJuzProgress(j), 0);
-  const streak = getStreak();
-  const completedJuz = TARGET_JUZ.filter(j => getJuzProgress(j) >= LINES_PER_JUZ).length;
-  const achs = [
-    { id: 'first', ico: '🌱', lbl: 'Pehla Qadam', unlocked: state.entries.length > 0 },
-    { id: 'week', ico: '🔥', lbl: '7 Din Streak', unlocked: streak >= 7 },
-    { id: 'month', ico: '⚡', lbl: '30 Din Streak', unlocked: streak >= 30 },
-    { id: 'c100', ico: '💯', lbl: '100 Lines', unlocked: totalDone >= 100 },
-    { id: 'c1000', ico: '🏅', lbl: '1000 Lines', unlocked: totalDone >= 1000 },
-    { id: 'juz1', ico: '📗', lbl: '1 Juz Khatam', unlocked: completedJuz >= 1 },
-    { id: 'juz3', ico: '📘', lbl: '3 Juz Khatam', unlocked: completedJuz >= 3 },
-    { id: 'juz5', ico: '📙', lbl: '5 Juz Khatam', unlocked: completedJuz >= 5 },
-  ];
-  $('achievements').innerHTML = achs.map(a =>
-    `<div class="ach ${a.unlocked?'unlocked':''}">
-      <div class="ico">${a.ico}</div>
-      <div class="lbl">${a.lbl}</div>
-    </div>`
-  ).join('');
-}
-function renderAudioLinks() {
-  const reciters = [
-    { name: 'Mishary', url: 'https://www.mp3quran.net/eng/mishari_alafasy' },
-    { name: 'Abdul Basit', url: 'https://www.mp3quran.net/eng/abasit' },
-    { name: 'Sudais', url: 'https://www.mp3quran.net/eng/sds' },
-    { name: 'Quran.com', url: 'https://quran.com' }
-  ];
-  $('audioLinks').innerHTML = reciters.map(r =>
-    `<a href="${r.url}" target="_blank" rel="noopener">🎧 ${r.name}</a>`
-  ).join('');
-}
+function renderAchievements(){const totalDone=TARGET_JUZ.reduce((s,j)=>s+getJuzProgress(j),0);const streak=getStreak();const completedJuz=TARGET_JUZ.filter(j=>getJuzProgress(j)>=LINES_PER_JUZ).length;const achs=[{ico:'🌱',lbl:'Pehla Qadam',u:state.entries.length>0},{ico:'🔥',lbl:'7 Din Streak',u:streak>=7},{ico:'⚡',lbl:'30 Din Streak',u:streak>=30},{ico:'💯',lbl:'100 Lines',u:totalDone>=100},{ico:'🏅',lbl:'1000 Lines',u:totalDone>=1000},{ico:'📗',lbl:'1 Juz Khatam',u:completedJuz>=1},{ico:'📘',lbl:'3 Juz Khatam',u:completedJuz>=3},{ico:'📙',lbl:'5 Juz Khatam',u:completedJuz>=5}];$('achievements').innerHTML=achs.map(a=>'<div class="ach '+(a.u?'unlocked':'')+'"><div class="ico">'+a.ico+'</div><div class="lbl">'+a.lbl+'</div></div>').join('');}
 
-/* ---------- GRAPH ---------- */
-function renderGraph() {
-  const canvas = $('lineGraph');
-  if (!canvas) return;
-  const wrap = canvas.parentElement;
-  const cssWidth = Math.max(340, wrap.clientWidth);
-  const cssHeight = 340;
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = cssWidth * dpr;
-  canvas.height = cssHeight * dpr;
-  canvas.style.width = cssWidth + 'px';
-  canvas.style.height = cssHeight + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
+function renderAudioLinks(){const reciters=[{name:'Mishary',url:'https://www.mp3quran.net/eng/mishari_alafasy'},{name:'Abdul Basit',url:'https://www.mp3quran.net/eng/abasit'},{name:'Sudais',url:'https://www.mp3quran.net/eng/sds'},{name:'Quran.com',url:'https://quran.com'}];$('audioLinks').innerHTML=reciters.map(r=>'<a href="'+r.url+'" target="_blank" rel="noopener">🎧 '+r.name+'</a>').join('');}
 
-  const padL = 34, padR = 12, padT = 14, padB = 44;
-  const chartW = cssWidth - padL - padR;
-  const chartH = cssHeight - padT - padB;
+function renderGraph(){const canvas=$('lineGraph');if(!canvas)return;const wrap=canvas.parentElement;const cssWidth=Math.max(340,wrap.clientWidth);const cssHeight=340;const dpr=window.devicePixelRatio||1;canvas.width=cssWidth*dpr;canvas.height=cssHeight*dpr;canvas.style.width=cssWidth+'px';canvas.style.height=cssHeight+'px';const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const padL=34,padR=12,padT=14,padB=44;const chartW=cssWidth-padL-padR;const chartH=cssHeight-padT-padB;const days=[];for(let i=20;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');days.push({date:d,ds:ds});}const dayTotals=days.map(d=>{const n=state.entries.filter(e=>e.date===d.ds&&e.type==='naya').reduce((s,e)=>s+e.lines,0);const s=state.entries.filter(e=>e.date===d.ds&&e.type==='sabqi').reduce((s,e)=>s+e.lines,0);const m=state.entries.filter(e=>e.date===d.ds&&e.type==='manzil').reduce((s,e)=>s+e.lines,0);return{naya:n,sabqi:s,manzil:m,total:n+s+m};});const maxVal=Math.max(50,...dayTotals.map(d=>d.total));const yMax=Math.ceil(maxVal/10)*10;const yStep=yMax<=50?5:(yMax<=100?10:Math.ceil(yMax/10));const isDark=settings.dark;const gridColor=isDark?'#3d5a4a':'#e0d4a8';const textColor=isDark?'#a89a7a':'#7a6f5c';const labelColor=isDark?'#e8c860':'#0d5c4a';ctx.font='11px Segoe UI, sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';for(let y=0;y<=yMax;y+=yStep){const yy=padT+chartH-(y/yMax)*chartH;ctx.strokeStyle=gridColor;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(padL+chartW,yy);ctx.stroke();ctx.fillStyle=textColor;ctx.fillText(y,padL-6,yy);}const barSlotW=chartW/days.length;const barW=Math.max(6,barSlotW*0.66);dayTotals.forEach((d,i)=>{const cx=padL+barSlotW*i+barSlotW/2;const x=cx-barW/2;let yCursor=padT+chartH;const segs=[{v:d.manzil,c:'#ff9d4d'},{v:d.sabqi,c:'#4d9eff'},{v:d.naya,c:isDark?'#e8c860':'#c9a227'}];segs.forEach(sg=>{if(sg.v<=0)return;const h=(sg.v/yMax)*chartH;yCursor-=h;ctx.fillStyle=sg.c;ctx.fillRect(x,yCursor,barW,h);});const dayNum=d.date.getDate();const monNum=d.date.getMonth()+1;ctx.fillStyle=textColor;ctx.font='9px Segoe UI, sans-serif';ctx.textAlign='center';ctx.textBaseline='top';ctx.save();ctx.translate(cx,padT+chartH+6);ctx.rotate(-Math.PI/3);ctx.fillText(dayNum+'/'+monNum,0,0);ctx.restore();});ctx.strokeStyle=labelColor;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(padL,padT);ctx.lineTo(padL,padT+chartH);ctx.lineTo(padL+chartW,padT+chartH);ctx.stroke();ctx.save();ctx.translate(10,padT+chartH/2);ctx.rotate(-Math.PI/2);ctx.fillStyle=labelColor;ctx.font='bold 10px Segoe UI';ctx.textAlign='center';ctx.fillText('LINES',0,0);ctx.restore();const total21=dayTotals.reduce((s,d)=>s+d.total,0);const avg=total21/21;const maxD=Math.max(...dayTotals.map(d=>d.total));$('graphTotal').textContent=total21+' lines';$('avgLines').textContent=avg.toFixed(1);$('maxLines').textContent=maxD;$('total21').textContent=total21;let totalDone=0;TARGET_JUZ.forEach(j=>totalDone+=getJuzProgress(j));const left=Math.max(0,TARGET_JUZ.length*LINES_PER_JUZ-totalDone);const daysSet=new Set(state.entries.map(e=>e.date));const d=daysSet.size||1;const avgAll=totalDone/d||settings.dailyTarget;const dLeft=Math.ceil(left/Math.max(1,avgAll));$('daysLeft').textContent=dLeft+' din';}
+window.addEventListener('resize',()=>{const a=document.querySelector('.page.active');if(a&&a.id==='graph')renderGraph();});
 
-  const days = [];
-  for (let i = 20; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    days.push({ date: d, ds });
-  }
-  const dayTotals = days.map(d => {
-    const n = state.entries.filter(e => e.date === d.ds && e.type === 'naya').reduce((s,e)=>s+e.lines,0);
-    const s = state.entries.filter(e => e.date === d.ds && e.type === 'sabqi').reduce((s,e)=>s+e.lines,0);
-    const m = state.entries.filter(e => e.date === d.ds && e.type === 'manzil').reduce((s,e)=>s+e.lines,0);
-    return { naya: n, sabqi: s, manzil: m, total: n + s + m };
-  });
+function fmtTimer(s){const h=String(Math.floor(s/3600)).padStart(2,'0');const m=String(Math.floor((s%3600)/60)).padStart(2,'0');const sec=String(s%60).padStart(2,'0');return h+':'+m+':'+sec;}
+function toggleTimer(){const btn=$('timerBtn');if(timerRunning){clearInterval(timerInterval);timerRunning=false;btn.textContent='▶ Start';}else{timerRunning=true;btn.textContent='⏸ Pause';timerInterval=setInterval(()=>{timerSeconds++;$('timerDisplay').textContent=fmtTimer(timerSeconds);},1000);}}
+function resetTimer(){clearInterval(timerInterval);timerRunning=false;timerSeconds=0;$('timerDisplay').textContent='00:00:00';$('timerBtn').textContent='▶ Start';}
+function saveTimerSession(){const juz=parseInt($('timerJuz').value);const type=$('timerType').value;const lines=parseInt($('timerLines').value);if(!lines||lines<=0){toast('⚠️ Lines likho');return;}const today=todayStr();const note='Session: '+fmtTimer(timerSeconds);state.entries.push({id:Date.now()+Math.random(),date:today,juz:juz,lines:lines,type:type,note:note});saveLocal();$('timerLines').value='';resetTimer();toast('✅ Session save!');renderDashboard();renderAchievements();updateTodayRemaining();}
 
-  const maxVal = Math.max(50, ...dayTotals.map(d => d.total));
-  const yMax = Math.ceil(maxVal / 10) * 10;
-  const yStep = yMax <= 50 ? 5 : (yMax <= 100 ? 10 : Math.ceil(yMax/10));
+function renderHistory(){const list=$('historyList');const q=($('searchInput').value||'').toLowerCase().trim();let items=[...state.entries];if(q){items=items.filter(e=>String(e.juz).includes(q)||(e.note||'').toLowerCase().includes(q)||e.date.includes(q)||e.type.includes(q));}items.sort((a,b)=>b.date.localeCompare(a.date)||(b.id>a.id?1:-1));$('historyCount').textContent='('+items.length+'/'+state.entries.length+')';if(items.length===0){list.innerHTML='<div class="empty">Koi entry nahi mili.</div>';return;}list.innerHTML=items.slice(0,200).map(e=>'<div class="entry '+e.type+'"><div class="entry-main"><div class="entry-title">Juz '+e.juz+' <span class="badge badge-'+e.type+'">'+e.type+'</span></div><div class="entry-detail">'+fmtDate(e.date)+(e.note?' — '+e.note:'')+'</div></div><div class="entry-lines">'+e.lines+'</div><button class="btn-danger" onclick="deleteEntry(\''+e.id+'\')">✕</button></div>').join('');}
 
-  const isDark = settings.dark;
-  const gridColor = isDark ? '#3d5a4a' : '#e0d4a8';
-  const textColor = isDark ? '#a89a7a' : '#7a6f5c';
-  const labelColor = isDark ? '#e8c860' : '#0d5c4a';
+async function renderQuranView(){if(currentPhotoJuz===null){$('quranJuzListView').classList.remove('hidden');$('quranJuzDetailView').classList.add('hidden');await renderJuzList();}else{$('quranJuzListView').classList.add('hidden');$('quranJuzDetailView').classList.remove('hidden');await renderJuzPhotos();}}
+async function renderJuzList(){const photos=await dbGetAll();const counts={};for(let i=1;i<=30;i++)counts[i]=0;photos.forEach(p=>{if(counts[p.juz]!==undefined)counts[p.juz]++;});const totalPhotos=photos.length;$('totalPhotoCount').textContent=totalPhotos>0?'('+totalPhotos+' total)':'';const grid=$('quranJuzGrid');let html='';for(let j=1;j<=30;j++){const c=counts[j];const hasPhotos=c>0;const memProgress=Math.min(100,(getJuzProgress(j)/LINES_PER_JUZ)*100);html+='<div class="quran-juz-card '+(hasPhotos?'has-photos':'')+'" onclick="openJuzPhotos('+j+')"><div class="juz-num">'+j+'</div><div class="juz-sub">Juz</div><div class="photo-badge '+(hasPhotos?'':'empty-badge')+'">'+c+' '+(c===1?'photo':'photos')+'</div><div class="juz-progress"><div class="juz-progress-fill" style="width:'+memProgress+'%"></div></div></div>';}grid.innerHTML=html;}
+function openJuzPhotos(juz){currentPhotoJuz=juz;renderQuranView();}
+function closeJuzPhotos(){currentPhotoJuz=null;renderQuranView();}
+async function renderJuzPhotos(){const juz=currentPhotoJuz;const all=await dbGetAll();const photos=all.filter(p=>p.juz===juz).sort((a,b)=>b.createdAt-a.createdAt);$('juzDetailTitle').innerHTML='Juz '+juz+'<small>'+photos.length+' photo · Hifz: '+getJuzProgress(juz)+'/'+LINES_PER_JUZ+' lines</small>';const grid=$('photoGrid');if(photos.length===0){grid.innerHTML='<div class="empty" style="grid-column:1/-1">Is juz me abhi koi photo nahi.</div>';return;}grid.innerHTML=photos.map(p=>'<div class="photo-thumb" onclick="openPhoto(\''+p.id+'\')"><img src="'+p.dataUrl+'" loading="lazy"><div class="photo-label">'+(p.label||'Page')+'</div></div>').join('');}
+async function handlePhotoUpload(ev){const files=Array.from(ev.target.files||[]);if(files.length===0)return;if(currentPhotoJuz===null){toast('⚠️ Pehle juz select karo');return;}const juz=currentPhotoJuz;toast('⏳ '+files.length+' photo(s) process ho rahi...');for(const file of files){try{const dataUrl=await compressImage(file);const photo={id:Date.now()+Math.random(),juz:juz,label:file.name.replace(/\.[^.]+$/,'').slice(0,30)||'Page',dataUrl:dataUrl,createdAt:Date.now()};await dbAdd(photo);}catch(err){console.error(err);}}ev.target.value='';toast('✅ Photos add ho gayi!');renderJuzPhotos();}
+async function openPhoto(id){const photos=await dbGetAll();const p=photos.find(x=>String(x.id)===String(id));if(!p)return;const v=document.createElement('div');v.className='photo-viewer';v.id='photoViewer';v.innerHTML='<button class="close-btn" onclick="closePhotoViewer()">✕</button><img src="'+p.dataUrl+'"><div class="info">Juz '+p.juz+' — '+(p.label||'')+'</div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn-small" onclick="deletePhoto(\''+p.id+'\')">🗑 Delete</button></div>';document.body.appendChild(v);}
+function closePhotoViewer(){const v=$('photoViewer');if(v)v.remove();}
+async function deletePhoto(id){if(!confirm('Ye photo delete?'))return;await dbDelete(id);closePhotoViewer();renderJuzPhotos();toast('🗑 Delete ho gayi');}
 
-  ctx.font = '11px Segoe UI, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  for (let y = 0; y <= yMax; y += yStep) {
-    const yy = padT + chartH - (y / yMax) * chartH;
-    ctx.strokeStyle = gridColor;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padL, yy);
-    ctx.lineTo(padL + chartW, yy);
-    ctx.stroke();
-    ctx.fillStyle = textColor;
-    ctx.fillText(y, padL - 6, yy);
-  }
+async function exportData(){toast('⏳ Backup ban raha hai...');const photos=await dbGetAll();const data={app:'Noor-al-Ikram',version:1,exportedAt:new Date().toISOString(),settings:settings,entries:state.entries,photos:photos};const blob=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='noor-al-ikram-backup-'+todayStr()+'.json';a.click();toast('✅ Backup download ho gaya');}
+function importData(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{try{const data=JSON.parse(e.target.result);if(!data.entries&&!data.photos)throw new Error('Format galat');if(!confirm('Restore karein?'))return;if(data.settings){settings=Object.assign(settings,data.settings);saveLocal();}if(Array.isArray(data.entries)){const ids=new Set(state.entries.map(x=>String(x.id)));data.entries.forEach(en=>{if(!ids.has(String(en.id)))state.entries.push(en);});saveLocal();}if(Array.isArray(data.photos)){for(const p of data.photos){try{await dbAdd(p);}catch(err){}}}applyDark();renderDashboard();renderAchievements();renderHistory();currentPhotoJuz=null;renderQuranView();toast('✅ Restore ho gaya!');}catch(err){toast('⚠️ File kharab hai');}};reader.readAsText(file);ev.target.value='';}
 
-  const barSlotW = chartW / days.length;
-  const barW = Math.max(6, barSlotW * 0.66);
-  dayTotals.forEach((d, i) => {
-    const cx = padL + barSlotW * i + barSlotW / 2;
-    const x = cx - barW / 2;
-    let yCursor = padT + chartH;
-
-    const segs = [
-      { v: d.manzil, c: '#ff9d4d' },
-      { v: d.sabqi, c: '#4d9eff' },
-      { v: d.naya, c: isDark ? '#e8c860' : '#c9a227' }
-    ];
-    segs.forEach(sg => {
-      if (sg.v <= 0) return;
-      const h = (sg.v / yMax) * chartH;
-      yCursor -= h;
-      ctx.fillStyle = sg.c;
-      ctx.beginPath();
-      const r = Math.min(3, barW/2);
-      ctx.moveTo(x, yCursor + h);
-      ctx.lineTo(x, yCursor + r);
-      ctx.quadraticCurveTo(x, yCursor, x + r, yCursor);
-      ctx.lineTo(x + barW - r, yCursor);
-      ctx.quadraticCurveTo(x + barW, yCursor, x + barW, yCursor + r);
-      ctx.lineTo(x + barW, yCursor + h);
-      ctx.closePath();
-      ctx.fill();
-    });
-
-    const dayNum = d.date.getDate();
-    const monNum = d.date.getMonth()+1;
-    ctx.fillStyle = textColor;
-    ctx.font = '9px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.save();
-    ctx.translate(cx, padT + chartH + 6);
-    ctx.rotate(-Math.PI / 3);
-    ctx.fillText(`${dayNum}/${monNum}`, 0, 0);
-    ctx.restore();
-  });
-
-  ctx.strokeStyle = labelColor;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(padL, padT);
-  ctx.lineTo(padL, padT + chartH);
-  ctx.lineTo(padL + chartW, padT + chartH);
-  ctx.stroke();
-
-  ctx.save();
-  ctx.translate(10, padT + chartH/2);
-  ctx.rotate(-Math.PI/2);
-  ctx.fillStyle = labelColor;
-  ctx.font = 'bold 10px Segoe UI';
-  ctx.textAlign = 'center';
-  ctx.fillText('LINES', 0, 0);
-  ctx.restore();
-
-  const total21 = dayTotals.reduce((s,d) => s + d.total, 0);
-  const avg = total21 / 21;
-  const maxD = Math.max(...dayTotals.map(d => d.total));
-  $('graphTotal').textContent = `${total21} lines`;
-  $('avgLines').textContent = avg.toFixed(1);
-  $('maxLines').textContent = maxD;
-  $('total21').textContent = total21;
-
-  let totalDone = 0;
-  TARGET_JUZ.forEach(j => totalDone += getJuzProgress(j));
-  const left = Math.max(0, TARGET_JUZ.length * LINES_PER_JUZ - totalDone);
-  const daysSet = new Set(state.entries.map(e=>e.date));
-  const d = daysSet.size || 1;
-  const avgAll = totalDone / d || settings.dailyTarget;
-  const dLeft = Math.ceil(left / Math.max(1, avgAll));
-  $('daysLeft').textContent = `${dLeft} din`;
-}
-window.addEventListener('resize', () => {
-  const active = document.querySelector('.page.active');
-  if (active && active.id === 'graph') renderGraph();
-});
-
-/* ---------- TIMER ---------- */
-function fmtTimer(s) {
-  const h = String(Math.floor(s/3600)).padStart(2,'0');
-  const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
-  const sec = String(s%60).padStart(2,'0');
-  return `${h}:${m}:${sec}`;
-}
-function toggleTimer() {
-  const btn = $('timerBtn');
-  if (timerRunning) {
-    clearInterval(timerInterval); timerRunning = false; btn.textContent = '▶ Start';
-  } else {
-    timerRunning = true; btn.textContent = '⏸ Pause';
-    timerInterval = setInterval(() => {
-      timerSeconds++;
-      $('timerDisplay').textContent = fmtTimer(timerSeconds);
-    }, 1000);
-  }
-}
-function resetTimer() {
-  clearInterval(timerInterval); timerRunning = false; timerSeconds = 0;
-  $('timerDisplay').textContent = '00:00:00';
-  $('timerBtn').textContent = '▶ Start';
-}
-function saveTimerSession() {
-  const juz = parseInt($('timerJuz').value);
-  const type = $('timerType').value;
-  const lines = parseInt($('timerLines').value);
-  if (!lines || lines <= 0) { toast('⚠️ Lines likho'); return; }
-  const today = todayStr();
-  const note = `Session: ${fmtTimer(timerSeconds)}`;
-  state.entries.push({ id: Date.now() + Math.random(), date: today, juz, lines, type, note });
-  saveLocal();
-  $('timerLines').value = '';
-  resetTimer();
-  toast('✅ Session save!');
-  renderDashboard();
-  renderAchievements();
-  updateTodayRemaining();
-}
-
-/* ---------- HISTORY ---------- */
-function renderHistory() {
-  const list = $('historyList');
-  const q = ($('searchInput').value || '').toLowerCase().trim();
-  let items = [...state.entries];
-  if (q) {
-    items = items.filter(e =>
-      String(e.juz).includes(q) ||
-      (e.note || '').toLowerCase().includes(q) ||
-      e.date.includes(q) ||
-      e.type.includes(q)
-    );
-  }
-  items.sort((a,b) => b.date.localeCompare(a.date) || (b.id > a.id ? 1 : -1));
-  $('historyCount').textContent = `(${items.length}/${state.entries.length})`;
-  if (items.length === 0) {
-    list.innerHTML = '<div class="empty">Koi entry nahi mili.</div>';
-    return;
-  }
-  list.innerHTML = items.slice(0, 200).map(e => `
-    <div class="entry ${e.type}">
-      <div class="entry-main">
-        <div class="entry-title">Juz ${e.juz} <span class="badge badge-${e.type}">${e.type}</span></div>
-        <div class="entry-detail">${fmtDate(e.date)}${e.note ? ' — ' + e.note : ''}</div>
-      </div>
-      <div class="entry-lines">${e.lines}</div>
-      <button class="btn-danger" onclick="deleteEntry('${e.id}')">✕</button>
-    </div>
-  `).join('');
-}
-
-/* ---------- QURAN / PHOTOS ---------- */
-async function renderQuranView() {
-  if (currentPhotoJuz === null) {
-    $('quranJuzListView').classList.remove('hidden');
-    $('quranJuzDetailView').classList.add('hidden');
-    await renderJuzList();
-  } else {
-    $('quranJuzListView').classList.add('hidden');
-    $('quranJuzDetailView').classList.remove('hidden');
-    await renderJuzPhotos();
-  }
-}
-
-async function renderJuzList() {
-  const photos = await dbGetAll();
-  const counts = {};
-  for (let i = 1; i <= 30; i++) counts[i] = 0;
-  photos.forEach(p => { if (counts[p.juz] !== undefined) counts[p.juz]++; });
-
-  const totalPhotos = photos.length;
-  $('totalPhotoCount').textContent = totalPhotos > 0 ? `(${totalPhotos} total)` : '';
-
-  const grid = $('quranJuzGrid');
-  let html = '';
-  for (let j = 1; j <= 30; j++) {
-    const c = counts[j];
-    const hasPhotos = c > 0;
-    const memProgress = Math.min(100, (getJuzProgress(j) / LINES_PER_JUZ) * 100);
-    html += `
-      <div class="quran-juz-card ${hasPhotos ? 'has-photos' : ''}" onclick="openJuzPhotos(${j})">
-        <div class="juz-num">${j}</div>
-        <div class="juz-sub">Juz</div>
-        <div class="photo-badge ${hasPhotos ? '' : 'empty-badge'}">
-          ${c} ${c === 1 ? 'photo' : 'photos'}
-        </div>
-        <div class="juz-progress" title="Hifz progress: ${memProgress.toFixed(0)}%">
-          <div class="juz-progress-fill" style="width:${memProgress}%"></div>
-        </div>
-      </div>
-    `;
-  }
-  grid.innerHTML = html;
-}
-
-function openJuzPhotos(juz) {
-  currentPhotoJuz = juz;
-  renderQuranView();
-}
-function closeJuzPhotos() {
-  currentPhotoJuz = null;
-  renderQuranView();
-}
-
-async function renderJuzPhotos() {
-  const juz = currentPhotoJuz;
-  const all = await dbGetAll();
-  const photos = all.filter(p => p.juz === juz).sort((a,b) => b.createdAt - a.createdAt);
-
-  $('juzDetailTitle').innerHTML = `Juz ${juz}
-    <small>${photos.length} ${photos.length === 1 ? 'photo' : 'photos'} · Hifz: ${getJuzProgress(juz)}/${LINES_PER_JUZ} lines</small>`;
-
-  const grid = $('photoGrid');
-  if (photos.length === 0) {
-    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Is juz me abhi koi photo nahi. Upar se add karo.</div>';
-    return;
-  }
-  grid.innerHTML = photos.map(p => `
-    <div class="photo-thumb" onclick="openPhoto('${p.id}')">
-      <img src="${p.dataUrl}" alt="Juz ${p.juz}" loading="lazy">
-      <div class="photo-label">${p.label || 'Page'}</div>
-    </div>
-  `).join('');
-}
-
-async function handlePhotoUpload(ev) {
-  const files = Array.from(ev.target.files || []);
-  if (files.length === 0) return;
-  if (currentPhotoJuz === null) { toast('⚠️ Pehle juz select karo'); return; }
-  const juz = currentPhotoJuz;
-  toast(`⏳ ${files.length} photo(s) process ho rahi...`);
-  for (const file of files) {
-    try {
-      const dataUrl = await compressImage(file);
-      const photo = {
-        id: Date.now() + Math.random(),
-        juz,
-        label: file.name.replace(/\.[^.]+$/, '').slice(0, 30) || 'Page',
-        dataUrl,
-        createdAt: Date.now()
-      };
-      await dbAdd(photo);
-    } catch(err) { console.error(err); }
-  }
-  ev.target.value = '';
-  toast('✅ Photos add ho gayi!');
-  renderJuzPhotos();
-}
-
-async function openPhoto(id) {
-  const photos = await dbGetAll();
-  const p = photos.find(x => String(x.id) === String(id));
-  if (!p) return;
-  const v = document.createElement('div');
-  v.className = 'photo-viewer';
-  v.id = 'photoViewer';
-  v.innerHTML = `
-    <button class="close-btn" onclick="closePhotoViewer()">✕</button>
-    <img src="${p.dataUrl}" alt="Juz ${p.juz}">
-    <div class="info">Juz ${p.juz} — ${p.label || ''}</div>
-    <div style="display:flex; gap:8px; margin-top:8px;">
-      <button class="btn-small" onclick="deletePhoto('${p.id}')">🗑 Delete</button>
-    </div>
-  `;
-  document.body.appendChild(v);
-}
-function closePhotoViewer() {
-  const v = $('photoViewer');
-  if (v) v.remove();
-}
-async function deletePhoto(id) {
-  if (!confirm('Ye photo delete?')) return;
-  await dbDelete(id);
-  closePhotoViewer();
-  renderJuzPhotos();
-  toast('🗑 Delete ho gayi');
-}
-
-/* ---------- BACKUP ---------- */
-async function exportData() {
-  toast('⏳ Backup ban raha hai...');
-  const photos = await dbGetAll();
-  const data = {
-    app: 'Noor-al-Ikram',
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    settings,
-    entries: state.entries,
-    photos
-  };
-  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `noor-al-ikram-backup-${todayStr()}.json`;
-  a.click();
-  toast('✅ Backup download ho gaya');
-}
-
-function importData(ev) {
-  const file = ev.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.entries && !data.photos) throw new Error('Format galat');
-      if (!confirm('Restore karein? Existing data ke saath merge hoga.')) return;
-
-      if (data.settings) { settings = Object.assign(settings, data.settings); saveLocal(); }
-      if (Array.isArray(data.entries)) {
-        const ids = new Set(state.entries.map(x => String(x.id)));
-        data.entries.forEach(en => { if (!ids.has(String(en.id))) state.entries.push(en); });
-        saveLocal();
-      }
-      if (Array.isArray(data.photos)) {
-        for (const p of data.photos) {
-          try { await dbAdd(p); } catch(err) {}
-        }
-      }
-      applyDark();
-      renderDashboard();
-      renderAchievements();
-      renderHistory();
-      currentPhotoJuz = null;
-      renderQuranView();
-      toast('✅ Restore ho gaya!');
-    } catch(err) {
-      toast('⚠️ File kharab hai');
-    }
-  };
-  reader.readAsText(file);
-  ev.target.value = '';
-}
-
-/* ---------- PWA ---------- */
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-/* ---------- INIT ---------- */
-(async function init() {
-  loadLocal();
-  applyDark();
-
-  const rs = $('reminderSwitch');
-  if (rs) rs.classList.toggle('on', settings.reminder);
-  const rt = $('reminderTime');
-  if (rt) rt.value = settings.reminderTime;
-  const dt = $('dailyTargetInput');
-  if (dt) dt.value = settings.dailyTarget;
-  const an = $('appNameInput');
-  if (an) an.value = settings.appName;
-
-  const sub = $('subtitle');
-  if (sub) sub.textContent = settings.appName;
-  const h1 = document.querySelector('.header h1');
-  if (h1) h1.textContent = '📖 ' + settings.appName;
-
-  fillJuzSelects();
-  const ld = $('logDate');
-  if (ld) ld.value = todayStr();
-
-  try { photoDB = await openPhotoDB(); } catch(e) { console.error('IndexedDB fail', e); }
-
-  renderDashboard();
-  renderAchievements();
-  renderAudioLinks();
-  renderHistory();
-  updateTodayRemaining();
-  await renderQuranView();
-
-  setTimeout(() => {
-    if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('nai_install_hint')) {
-      localStorage.setItem('nai_install_hint', '1');
-      toast('📱 Browser menu se "Add to Home Screen" karo — app ban jayega', 4000);
-    }
-  }, 3000);
-})();
+(async function init(){loadLocal();applyDark();if($('reminderSwitch'))$('reminderSwitch').classList.toggle('on',settings.reminder);if($('reminderTime'))$('reminderTime').value=settings.reminderTime;if($('dailyTargetInput'))$('dailyTargetInput').value=settings.dailyTarget;if($('appNameInput'))$('appNameInput').value=settings.appName;if($('subtitle'))$('subtitle').textContent=settings.appName;const h1=document.querySelector('.header h1');if(h1)h1.textContent='📖 '+settings.appName;fillJuzSelects();if($('logDate'))$('logDate').value=todayStr();try{photoDB=await openPhotoDB();}catch(e){console.error('IndexedDB fail',e);}renderDashboard();renderAchievements();renderAudioLinks();renderHistory();updateTodayRemaining();await renderQuranView();})();
 </script>
+
+</body>
+</html>
