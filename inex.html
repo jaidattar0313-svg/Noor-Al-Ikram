@@ -1,0 +1,795 @@
+<script>
+/* ============================================================
+   NOOR-AL-IKRAM v1.2 — Complete Script (fixed)
+   ============================================================ */
+
+const ENTRIES_KEY = 'nai_entries_v1';
+const SETTINGS_KEY = 'nai_settings_v1';
+const PHOTO_DB = 'NoorAlIkramDB';
+const PHOTO_STORE = 'photos';
+const LINES_PER_JUZ = 300;
+const TARGET_JUZ = [13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+
+let state = { entries: [] };
+let settings = {
+  dark: false,
+  reminder: false,
+  reminderTime: '06:00',
+  dailyTarget: 10,
+  appName: 'Noor-al-Ikram'
+};
+let photoDB = null;
+let deferredPrompt = null;
+let timerInterval = null, timerSeconds = 0, timerRunning = false;
+let currentPhotoJuz = null;
+
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function dateFromStr(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function fmtDate(s) {
+  const days = ['Itwaar','Peer','Mangal','Budh','Jumeraat','Jumma','Hafta'];
+  const dt = dateFromStr(s);
+  return `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()} (${days[dt.getDay()]})`;
+}
+function toast(msg, ms = 2200) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ---------- STORAGE ---------- */
+function loadLocal() {
+  try {
+    const e = localStorage.getItem(ENTRIES_KEY);
+    if (e) state.entries = JSON.parse(e);
+    const s = localStorage.getItem(SETTINGS_KEY);
+    if (s) settings = Object.assign(settings, JSON.parse(s));
+  } catch(err) { console.error(err); }
+}
+function saveLocal() {
+  localStorage.setItem(ENTRIES_KEY, JSON.stringify(state.entries));
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+/* ---------- INDEXEDDB ---------- */
+function openPhotoDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PHOTO_DB, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(PHOTO_STORE)) {
+        const store = db.createObjectStore(PHOTO_STORE, { keyPath: 'id' });
+        store.createIndex('juz', 'juz', { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function dbAdd(photo) {
+  return new Promise((resolve, reject) => {
+    const tx = photoDB.transaction(PHOTO_STORE, 'readwrite');
+    const req = tx.objectStore(PHOTO_STORE).put(photo);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function dbGetAll() {
+  return new Promise((resolve, reject) => {
+    const tx = photoDB.transaction(PHOTO_STORE, 'readonly');
+    const req = tx.objectStore(PHOTO_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+function dbDelete(id) {
+  return new Promise((resolve, reject) => {
+    const tx = photoDB.transaction(PHOTO_STORE, 'readwrite');
+    const req = tx.objectStore(PHOTO_STORE).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/* ---------- IMAGE COMPRESS ---------- */
+function compressImage(file, maxWidth = 1400, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = Math.round((maxWidth / width) * height);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- TABS ---------- */
+$$('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.tab').forEach(t => t.classList.remove('active'));
+    $$('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    $(tab.dataset.page).classList.add('active');
+    if (tab.dataset.page === 'dashboard') { renderDashboard(); renderAchievements(); renderAudioLinks(); }
+    if (tab.dataset.page === 'history') renderHistory();
+    if (tab.dataset.page === 'log') updateTodayRemaining();
+    if (tab.dataset.page === 'graph') renderGraph();
+    if (tab.dataset.page === 'photos') { currentPhotoJuz = null; renderQuranView(); }
+  });
+});
+
+/* ---------- DARK MODE ---------- */
+function toggleDark() {
+  settings.dark = !settings.dark;
+  applyDark();
+  saveLocal();
+}
+function applyDark() {
+  document.body.classList.toggle('dark', settings.dark);
+  $('darkBtn').textContent = settings.dark ? '☀️' : '🌙';
+  $('darkSwitch').classList.toggle('on', settings.dark);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', settings.dark ? '#0a1811' : '#0d5c4a');
+  if (document.querySelector('.page.active').id === 'graph') renderGraph();
+}
+
+/* ---------- REMINDER ---------- */
+function toggleReminder() {
+  settings.reminder = !settings.reminder;
+  $('reminderSwitch').classList.toggle('on', settings.reminder);
+  saveLocal();
+  if (settings.reminder && 'Notification' in window) {
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') toast('✅ Reminder on!');
+        else { settings.reminder = false; $('reminderSwitch').classList.remove('on'); saveLocal(); toast('⚠️ Permission nahi mili'); }
+      });
+    } else toast('✅ Reminder on!');
+  }
+}
+function saveReminderTime() {
+  settings.reminderTime = $('reminderTime').value;
+  saveLocal();
+}
+function checkReminder() {
+  if (!settings.reminder) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const nowStr = `${hh}:${mm}`;
+  if (nowStr === settings.reminderTime) {
+    const last = localStorage.getItem('nai_last_reminder');
+    if (last !== todayStr()) {
+      localStorage.setItem('nai_last_reminder', todayStr());
+      if (Notification.permission === 'granted') {
+        new Notification('📖 Noor-al-Ikram', { body: 'Aaj ka sabaq baaki hai. Utho, hifz ka waqt ho gaya!' });
+      }
+    }
+  }
+}
+setInterval(checkReminder, 30000);
+
+/* ---------- SETTINGS ---------- */
+function saveDailyTarget() {
+  settings.dailyTarget = parseInt($('dailyTargetInput').value) || 10;
+  saveLocal();
+  renderDashboard();
+  updateTodayRemaining();
+}
+function saveAppName() {
+  settings.appName = $('appNameInput').value.trim() || 'Noor-al-Ikram';
+  $('subtitle').textContent = settings.appName;
+  document.querySelector('.header h1').textContent = '📖 ' + settings.appName;
+  saveLocal();
+}
+
+/* ---------- JUZ SELECTS ---------- */
+function fillJuzSelects() {
+  let html = '';
+  for (let i=1; i<=30; i++) {
+    const mark = TARGET_JUZ.includes(i) ? ' ⭐' : '';
+    html += `<option value="${i}">Juz ${i}${mark}</option>`;
+  }
+  $('logJuz').innerHTML = html;
+  $('timerJuz').innerHTML = html;
+  $('logJuz').value = 13;
+  $('timerJuz').value = 13;
+}
+
+/* ---------- ENTRIES ---------- */
+function addEntry() {
+  const date = $('logDate').value;
+  const juz = parseInt($('logJuz').value);
+  const lines = parseInt($('logLines').value);
+  const type = $('logType').value;
+  const note = $('logNote').value.trim();
+  if (!date || !juz || !lines || lines <= 0) { toast('⚠️ Sab fields bharein'); return; }
+  state.entries.push({ id: Date.now() + Math.random(), date, juz, lines, type, note });
+  saveLocal();
+  $('logLines').value = '';
+  $('logNote').value = '';
+  toast('✅ Save ho gaya!');
+  renderDashboard();
+  renderAchievements();
+  updateTodayRemaining();
+}
+function deleteEntry(id) {
+  if (!confirm('Ye entry delete?')) return;
+  state.entries = state.entries.filter(e => String(e.id) !== String(id));
+  saveLocal();
+  renderHistory();
+  renderDashboard();
+  renderAchievements();
+  updateTodayRemaining();
+}
+function clearAll() {
+  if (!confirm('SAB entries delete ho jayengi. Pakka?')) return;
+  if (!confirm('Photos safe rahengi. Sirf entries hatengi. Backup liya hai?')) return;
+  state.entries = [];
+  saveLocal();
+  renderHistory();
+  renderDashboard();
+  renderAchievements();
+  toast('🗑 Entries delete ho gayi');
+}
+
+/* ---------- DASHBOARD ---------- */
+function getJuzProgress(juz) {
+  return state.entries
+    .filter(e => e.juz === juz && e.type === 'naya')
+    .reduce((s, e) => s + e.lines, 0);
+}
+function getStreak() {
+  const dates = new Set(state.entries.map(e => e.date));
+  let streak = 0;
+  let check = new Date();
+  for (let k=0; k<365; k++) {
+    const ds = check.getFullYear() + '-' + String(check.getMonth()+1).padStart(2,'0') + '-' + String(check.getDate()).padStart(2,'0');
+    if (dates.has(ds)) { streak++; check.setDate(check.getDate()-1); }
+    else if (k === 0) { check.setDate(check.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function renderDashboard() {
+  let totalDone = 0;
+  TARGET_JUZ.forEach(j => totalDone += getJuzProgress(j));
+  const totalTarget = TARGET_JUZ.length * LINES_PER_JUZ;
+  const left = Math.max(0, totalTarget - totalDone);
+  const pct = Math.min(100, (totalDone / totalTarget) * 100);
+  $('statDone').textContent = totalDone;
+  $('statLeft').textContent = left;
+  $('statDays').textContent = new Set(state.entries.map(e=>e.date)).size;
+  $('overallFill').style.width = pct + '%';
+  $('overallText').textContent = pct.toFixed(1) + '%';
+  const today = todayStr();
+  const todayLines = state.entries.filter(e => e.date === today).reduce((s,e) => s + e.lines, 0);
+  $('todayLines').textContent = todayLines;
+  $('streak').textContent = getStreak();
+
+  const days = new Set(state.entries.map(e=>e.date)).size || 1;
+  const avg = totalDone / days || settings.dailyTarget;
+  const remainingDays = Math.ceil(left / Math.max(1, avg));
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + remainingDays);
+  $('targetDate').textContent = `${targetDate.getDate()}/${targetDate.getMonth()+1}/${String(targetDate.getFullYear()).slice(2)}`;
+
+  const grid = $('juzGrid');
+  let gHtml = '';
+  TARGET_JUZ.forEach(j => {
+    const done = getJuzProgress(j);
+    const leftJ = Math.max(0, LINES_PER_JUZ - done);
+    const p = Math.min(100, (done / LINES_PER_JUZ) * 100);
+    const cls = done >= LINES_PER_JUZ ? 'done' : (done > 0 ? 'pending' : '');
+    gHtml += `<div class="juz-card ${cls}">
+      <div class="juz-title"><span>Juz ${j}</span><span>${done}/${LINES_PER_JUZ}</span></div>
+      <div class="juz-mini-bar"><div class="juz-mini-fill" style="width:${p}%"></div></div>
+      <div class="juz-info"><span>Baki: ${leftJ}</span><span>${p.toFixed(0)}%</span></div>
+    </div>`;
+  });
+  grid.innerHTML = gHtml;
+}
+function updateTodayRemaining() {
+  const today = todayStr();
+  const todayNaya = state.entries
+    .filter(e => e.date === today && e.type === 'naya')
+    .reduce((s,e) => s + e.lines, 0);
+  const remain = Math.max(0, settings.dailyTarget - todayNaya);
+  $('todayRemaining').textContent = remain;
+}
+function renderAchievements() {
+  const totalDone = TARGET_JUZ.reduce((s,j) => s + getJuzProgress(j), 0);
+  const streak = getStreak();
+  const completedJuz = TARGET_JUZ.filter(j => getJuzProgress(j) >= LINES_PER_JUZ).length;
+  const achs = [
+    { id: 'first', ico: '🌱', lbl: 'Pehla Qadam', unlocked: state.entries.length > 0 },
+    { id: 'week', ico: '🔥', lbl: '7 Din Streak', unlocked: streak >= 7 },
+    { id: 'month', ico: '⚡', lbl: '30 Din Streak', unlocked: streak >= 30 },
+    { id: 'c100', ico: '💯', lbl: '100 Lines', unlocked: totalDone >= 100 },
+    { id: 'c1000', ico: '🏅', lbl: '1000 Lines', unlocked: totalDone >= 1000 },
+    { id: 'juz1', ico: '📗', lbl: '1 Juz Khatam', unlocked: completedJuz >= 1 },
+    { id: 'juz3', ico: '📘', lbl: '3 Juz Khatam', unlocked: completedJuz >= 3 },
+    { id: 'juz5', ico: '📙', lbl: '5 Juz Khatam', unlocked: completedJuz >= 5 },
+  ];
+  $('achievements').innerHTML = achs.map(a =>
+    `<div class="ach ${a.unlocked?'unlocked':''}">
+      <div class="ico">${a.ico}</div>
+      <div class="lbl">${a.lbl}</div>
+    </div>`
+  ).join('');
+}
+function renderAudioLinks() {
+  const reciters = [
+    { name: 'Mishary', url: 'https://www.mp3quran.net/eng/mishari_alafasy' },
+    { name: 'Abdul Basit', url: 'https://www.mp3quran.net/eng/abasit' },
+    { name: 'Sudais', url: 'https://www.mp3quran.net/eng/sds' },
+    { name: 'Quran.com', url: 'https://quran.com' }
+  ];
+  $('audioLinks').innerHTML = reciters.map(r =>
+    `<a href="${r.url}" target="_blank" rel="noopener">🎧 ${r.name}</a>`
+  ).join('');
+}
+
+/* ---------- GRAPH ---------- */
+function renderGraph() {
+  const canvas = $('lineGraph');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  const cssWidth = Math.max(340, wrap.clientWidth);
+  const cssHeight = 340;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = cssWidth * dpr;
+  canvas.height = cssHeight * dpr;
+  canvas.style.width = cssWidth + 'px';
+  canvas.style.height = cssHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const padL = 34, padR = 12, padT = 14, padB = 44;
+  const chartW = cssWidth - padL - padR;
+  const chartH = cssHeight - padT - padB;
+
+  const days = [];
+  for (let i = 20; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    days.push({ date: d, ds });
+  }
+  const dayTotals = days.map(d => {
+    const n = state.entries.filter(e => e.date === d.ds && e.type === 'naya').reduce((s,e)=>s+e.lines,0);
+    const s = state.entries.filter(e => e.date === d.ds && e.type === 'sabqi').reduce((s,e)=>s+e.lines,0);
+    const m = state.entries.filter(e => e.date === d.ds && e.type === 'manzil').reduce((s,e)=>s+e.lines,0);
+    return { naya: n, sabqi: s, manzil: m, total: n + s + m };
+  });
+
+  const maxVal = Math.max(50, ...dayTotals.map(d => d.total));
+  const yMax = Math.ceil(maxVal / 10) * 10;
+  const yStep = yMax <= 50 ? 5 : (yMax <= 100 ? 10 : Math.ceil(yMax/10));
+
+  const isDark = settings.dark;
+  const gridColor = isDark ? '#3d5a4a' : '#e0d4a8';
+  const textColor = isDark ? '#a89a7a' : '#7a6f5c';
+  const labelColor = isDark ? '#e8c860' : '#0d5c4a';
+
+  ctx.font = '11px Segoe UI, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let y = 0; y <= yMax; y += yStep) {
+    const yy = padT + chartH - (y / yMax) * chartH;
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, yy);
+    ctx.lineTo(padL + chartW, yy);
+    ctx.stroke();
+    ctx.fillStyle = textColor;
+    ctx.fillText(y, padL - 6, yy);
+  }
+
+  const barSlotW = chartW / days.length;
+  const barW = Math.max(6, barSlotW * 0.66);
+  dayTotals.forEach((d, i) => {
+    const cx = padL + barSlotW * i + barSlotW / 2;
+    const x = cx - barW / 2;
+    let yCursor = padT + chartH;
+
+    const segs = [
+      { v: d.manzil, c: '#ff9d4d' },
+      { v: d.sabqi, c: '#4d9eff' },
+      { v: d.naya, c: isDark ? '#e8c860' : '#c9a227' }
+    ];
+    segs.forEach(sg => {
+      if (sg.v <= 0) return;
+      const h = (sg.v / yMax) * chartH;
+      yCursor -= h;
+      ctx.fillStyle = sg.c;
+      ctx.beginPath();
+      const r = Math.min(3, barW/2);
+      ctx.moveTo(x, yCursor + h);
+      ctx.lineTo(x, yCursor + r);
+      ctx.quadraticCurveTo(x, yCursor, x + r, yCursor);
+      ctx.lineTo(x + barW - r, yCursor);
+      ctx.quadraticCurveTo(x + barW, yCursor, x + barW, yCursor + r);
+      ctx.lineTo(x + barW, yCursor + h);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    const dayNum = d.date.getDate();
+    const monNum = d.date.getMonth()+1;
+    ctx.fillStyle = textColor;
+    ctx.font = '9px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.save();
+    ctx.translate(cx, padT + chartH + 6);
+    ctx.rotate(-Math.PI / 3);
+    ctx.fillText(`${dayNum}/${monNum}`, 0, 0);
+    ctx.restore();
+  });
+
+  ctx.strokeStyle = labelColor;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT + chartH);
+  ctx.lineTo(padL + chartW, padT + chartH);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.translate(10, padT + chartH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = labelColor;
+  ctx.font = 'bold 10px Segoe UI';
+  ctx.textAlign = 'center';
+  ctx.fillText('LINES', 0, 0);
+  ctx.restore();
+
+  const total21 = dayTotals.reduce((s,d) => s + d.total, 0);
+  const avg = total21 / 21;
+  const maxD = Math.max(...dayTotals.map(d => d.total));
+  $('graphTotal').textContent = `${total21} lines`;
+  $('avgLines').textContent = avg.toFixed(1);
+  $('maxLines').textContent = maxD;
+  $('total21').textContent = total21;
+
+  let totalDone = 0;
+  TARGET_JUZ.forEach(j => totalDone += getJuzProgress(j));
+  const left = Math.max(0, TARGET_JUZ.length * LINES_PER_JUZ - totalDone);
+  const daysSet = new Set(state.entries.map(e=>e.date));
+  const d = daysSet.size || 1;
+  const avgAll = totalDone / d || settings.dailyTarget;
+  const dLeft = Math.ceil(left / Math.max(1, avgAll));
+  $('daysLeft').textContent = `${dLeft} din`;
+}
+window.addEventListener('resize', () => {
+  const active = document.querySelector('.page.active');
+  if (active && active.id === 'graph') renderGraph();
+});
+
+/* ---------- TIMER ---------- */
+function fmtTimer(s) {
+  const h = String(Math.floor(s/3600)).padStart(2,'0');
+  const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  return `${h}:${m}:${sec}`;
+}
+function toggleTimer() {
+  const btn = $('timerBtn');
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false; btn.textContent = '▶ Start';
+  } else {
+    timerRunning = true; btn.textContent = '⏸ Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      $('timerDisplay').textContent = fmtTimer(timerSeconds);
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = 0;
+  $('timerDisplay').textContent = '00:00:00';
+  $('timerBtn').textContent = '▶ Start';
+}
+function saveTimerSession() {
+  const juz = parseInt($('timerJuz').value);
+  const type = $('timerType').value;
+  const lines = parseInt($('timerLines').value);
+  if (!lines || lines <= 0) { toast('⚠️ Lines likho'); return; }
+  const today = todayStr();
+  const note = `Session: ${fmtTimer(timerSeconds)}`;
+  state.entries.push({ id: Date.now() + Math.random(), date: today, juz, lines, type, note });
+  saveLocal();
+  $('timerLines').value = '';
+  resetTimer();
+  toast('✅ Session save!');
+  renderDashboard();
+  renderAchievements();
+  updateTodayRemaining();
+}
+
+/* ---------- HISTORY ---------- */
+function renderHistory() {
+  const list = $('historyList');
+  const q = ($('searchInput').value || '').toLowerCase().trim();
+  let items = [...state.entries];
+  if (q) {
+    items = items.filter(e =>
+      String(e.juz).includes(q) ||
+      (e.note || '').toLowerCase().includes(q) ||
+      e.date.includes(q) ||
+      e.type.includes(q)
+    );
+  }
+  items.sort((a,b) => b.date.localeCompare(a.date) || (b.id > a.id ? 1 : -1));
+  $('historyCount').textContent = `(${items.length}/${state.entries.length})`;
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty">Koi entry nahi mili.</div>';
+    return;
+  }
+  list.innerHTML = items.slice(0, 200).map(e => `
+    <div class="entry ${e.type}">
+      <div class="entry-main">
+        <div class="entry-title">Juz ${e.juz} <span class="badge badge-${e.type}">${e.type}</span></div>
+        <div class="entry-detail">${fmtDate(e.date)}${e.note ? ' — ' + e.note : ''}</div>
+      </div>
+      <div class="entry-lines">${e.lines}</div>
+      <button class="btn-danger" onclick="deleteEntry('${e.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+/* ---------- QURAN / PHOTOS ---------- */
+async function renderQuranView() {
+  if (currentPhotoJuz === null) {
+    $('quranJuzListView').classList.remove('hidden');
+    $('quranJuzDetailView').classList.add('hidden');
+    await renderJuzList();
+  } else {
+    $('quranJuzListView').classList.add('hidden');
+    $('quranJuzDetailView').classList.remove('hidden');
+    await renderJuzPhotos();
+  }
+}
+
+async function renderJuzList() {
+  const photos = await dbGetAll();
+  const counts = {};
+  for (let i = 1; i <= 30; i++) counts[i] = 0;
+  photos.forEach(p => { if (counts[p.juz] !== undefined) counts[p.juz]++; });
+
+  const totalPhotos = photos.length;
+  $('totalPhotoCount').textContent = totalPhotos > 0 ? `(${totalPhotos} total)` : '';
+
+  const grid = $('quranJuzGrid');
+  let html = '';
+  for (let j = 1; j <= 30; j++) {
+    const c = counts[j];
+    const hasPhotos = c > 0;
+    const memProgress = Math.min(100, (getJuzProgress(j) / LINES_PER_JUZ) * 100);
+    html += `
+      <div class="quran-juz-card ${hasPhotos ? 'has-photos' : ''}" onclick="openJuzPhotos(${j})">
+        <div class="juz-num">${j}</div>
+        <div class="juz-sub">Juz</div>
+        <div class="photo-badge ${hasPhotos ? '' : 'empty-badge'}">
+          ${c} ${c === 1 ? 'photo' : 'photos'}
+        </div>
+        <div class="juz-progress" title="Hifz progress: ${memProgress.toFixed(0)}%">
+          <div class="juz-progress-fill" style="width:${memProgress}%"></div>
+        </div>
+      </div>
+    `;
+  }
+  grid.innerHTML = html;
+}
+
+function openJuzPhotos(juz) {
+  currentPhotoJuz = juz;
+  renderQuranView();
+}
+function closeJuzPhotos() {
+  currentPhotoJuz = null;
+  renderQuranView();
+}
+
+async function renderJuzPhotos() {
+  const juz = currentPhotoJuz;
+  const all = await dbGetAll();
+  const photos = all.filter(p => p.juz === juz).sort((a,b) => b.createdAt - a.createdAt);
+
+  $('juzDetailTitle').innerHTML = `Juz ${juz}
+    <small>${photos.length} ${photos.length === 1 ? 'photo' : 'photos'} · Hifz: ${getJuzProgress(juz)}/${LINES_PER_JUZ} lines</small>`;
+
+  const grid = $('photoGrid');
+  if (photos.length === 0) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">Is juz me abhi koi photo nahi. Upar se add karo.</div>';
+    return;
+  }
+  grid.innerHTML = photos.map(p => `
+    <div class="photo-thumb" onclick="openPhoto('${p.id}')">
+      <img src="${p.dataUrl}" alt="Juz ${p.juz}" loading="lazy">
+      <div class="photo-label">${p.label || 'Page'}</div>
+    </div>
+  `).join('');
+}
+
+async function handlePhotoUpload(ev) {
+  const files = Array.from(ev.target.files || []);
+  if (files.length === 0) return;
+  if (currentPhotoJuz === null) { toast('⚠️ Pehle juz select karo'); return; }
+  const juz = currentPhotoJuz;
+  toast(`⏳ ${files.length} photo(s) process ho rahi...`);
+  for (const file of files) {
+    try {
+      const dataUrl = await compressImage(file);
+      const photo = {
+        id: Date.now() + Math.random(),
+        juz,
+        label: file.name.replace(/\.[^.]+$/, '').slice(0, 30) || 'Page',
+        dataUrl,
+        createdAt: Date.now()
+      };
+      await dbAdd(photo);
+    } catch(err) { console.error(err); }
+  }
+  ev.target.value = '';
+  toast('✅ Photos add ho gayi!');
+  renderJuzPhotos();
+}
+
+async function openPhoto(id) {
+  const photos = await dbGetAll();
+  const p = photos.find(x => String(x.id) === String(id));
+  if (!p) return;
+  const v = document.createElement('div');
+  v.className = 'photo-viewer';
+  v.id = 'photoViewer';
+  v.innerHTML = `
+    <button class="close-btn" onclick="closePhotoViewer()">✕</button>
+    <img src="${p.dataUrl}" alt="Juz ${p.juz}">
+    <div class="info">Juz ${p.juz} — ${p.label || ''}</div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-small" onclick="deletePhoto('${p.id}')">🗑 Delete</button>
+    </div>
+  `;
+  document.body.appendChild(v);
+}
+function closePhotoViewer() {
+  const v = $('photoViewer');
+  if (v) v.remove();
+}
+async function deletePhoto(id) {
+  if (!confirm('Ye photo delete?')) return;
+  await dbDelete(id);
+  closePhotoViewer();
+  renderJuzPhotos();
+  toast('🗑 Delete ho gayi');
+}
+
+/* ---------- BACKUP ---------- */
+async function exportData() {
+  toast('⏳ Backup ban raha hai...');
+  const photos = await dbGetAll();
+  const data = {
+    app: 'Noor-al-Ikram',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    settings,
+    entries: state.entries,
+    photos
+  };
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `noor-al-ikram-backup-${todayStr()}.json`;
+  a.click();
+  toast('✅ Backup download ho gaya');
+}
+
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.entries && !data.photos) throw new Error('Format galat');
+      if (!confirm('Restore karein? Existing data ke saath merge hoga.')) return;
+
+      if (data.settings) { settings = Object.assign(settings, data.settings); saveLocal(); }
+      if (Array.isArray(data.entries)) {
+        const ids = new Set(state.entries.map(x => String(x.id)));
+        data.entries.forEach(en => { if (!ids.has(String(en.id))) state.entries.push(en); });
+        saveLocal();
+      }
+      if (Array.isArray(data.photos)) {
+        for (const p of data.photos) {
+          try { await dbAdd(p); } catch(err) {}
+        }
+      }
+      applyDark();
+      renderDashboard();
+      renderAchievements();
+      renderHistory();
+      currentPhotoJuz = null;
+      renderQuranView();
+      toast('✅ Restore ho gaya!');
+    } catch(err) {
+      toast('⚠️ File kharab hai');
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+
+/* ---------- PWA ---------- */
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+/* ---------- INIT ---------- */
+(async function init() {
+  loadLocal();
+  applyDark();
+
+  const rs = $('reminderSwitch');
+  if (rs) rs.classList.toggle('on', settings.reminder);
+  const rt = $('reminderTime');
+  if (rt) rt.value = settings.reminderTime;
+  const dt = $('dailyTargetInput');
+  if (dt) dt.value = settings.dailyTarget;
+  const an = $('appNameInput');
+  if (an) an.value = settings.appName;
+
+  const sub = $('subtitle');
+  if (sub) sub.textContent = settings.appName;
+  const h1 = document.querySelector('.header h1');
+  if (h1) h1.textContent = '📖 ' + settings.appName;
+
+  fillJuzSelects();
+  const ld = $('logDate');
+  if (ld) ld.value = todayStr();
+
+  try { photoDB = await openPhotoDB(); } catch(e) { console.error('IndexedDB fail', e); }
+
+  renderDashboard();
+  renderAchievements();
+  renderAudioLinks();
+  renderHistory();
+  updateTodayRemaining();
+  await renderQuranView();
+
+  setTimeout(() => {
+    if (!window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('nai_install_hint')) {
+      localStorage.setItem('nai_install_hint', '1');
+      toast('📱 Browser menu se "Add to Home Screen" karo — app ban jayega', 4000);
+    }
+  }, 3000);
+})();
+</script>
